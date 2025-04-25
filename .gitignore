@@ -1,0 +1,52 @@
+cat > .gitignore << 'EOF'
+# ────────────────────────────────────────────────────
+# 환경 변수 파일 (비밀 정보)
+.env
+
+# Python 바이트코드
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python 패키지 메타데이터
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Python 가상환경
+env/
+venv/
+.venv/
+
+# Django 로컬 DB (개발용 SQLite)
+db.sqlite3
+
+# Django 로그 & 커버리지
+*.log
+*.pot
+*.mo
+htmlcov/
+.coverage
+.coverage.*
+
+# Django 로컬 설정 오버라이드
+local_settings.py
+
+# 정적·미디어 파일
+static/
+media/
+
+# IDE 및 에디터 설정
+.idea/           # PyCharm, IntelliJ
+*.iml            # PyCharm 모듈 파일
+.vscode/
+
+# PostgreSQL 히스토리 및 덤프
+*.psql_history
+# 만약 프로젝트 내 SQL 덤프를 커밋하지 않을 거면 아래 주석 해제
+# *.sql
+
+# macOS
+.DS_Store
+EOF
+
