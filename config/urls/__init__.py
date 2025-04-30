@@ -4,5 +4,5 @@ import os
 from .urls_dev import *
 
 # 환경 변수에 따라 배포 환경 URL 사용
-if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings.prod':
+if os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.prod":
     from .urls_prod import *
