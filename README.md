@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# MoCOMOCo Project
+# MoCOMOCo
 
 ## 프로젝트 소개
 [개발하는 사람들끼리 모여서 프로젝트 진행하는 모임]
