@@ -35,7 +35,6 @@ INSTALLED_APPS = [
 
     # Third party
     'rest_framework',
-    'ninja',
 ]
 
 MIDDLEWARE = [
