@@ -2,7 +2,13 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['your-production-domain.com']
+ALLOWED_HOSTS = [
+    "www.mocomoco.store",
+    "mocomoco.store",
+    "127.0.0.1",
+    "localhost",
+    "15.164.219.164",
+]
 
 # 배포용 PostgreSQL 데이터베이스 (나중에 필요할 때 설정)
 DATABASES = {
