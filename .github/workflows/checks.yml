@@ -76,6 +76,7 @@ jobs:
 
     # 정상적인 db연결을 확인했으니 마이그레이션 수행
     - name: Run Django Migration
+      working-directory: ./Back-end/moCOMOco
       run: |
         poetry run python manage.py makemigrations
         poetry run python manage.py migrate
@@ -84,3 +85,7 @@ jobs:
     - name: Test python project
       run: |
         poetry run python manage.py test
+
+    - name: Set working directory
+             - run: echo "Setting working directory"
+             - working-directory: ./Back-end/moCOMOco
