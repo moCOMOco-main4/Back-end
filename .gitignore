@@ -50,7 +50,7 @@ media/
 # macOS
 .DS_Store
 EOF
-
+.idea/
 =======
 # Created by https://www.toptal.com/developers/gitignore/api/django,ninja,pythonvanilla,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,ninja,pythonvanilla,macos
