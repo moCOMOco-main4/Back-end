@@ -54,7 +54,7 @@ jobs:
     # Poetry를 사용하여 의존성 패키지들을 설치합니다.
     - name: Install Packages & Libraries
       run: |
-        poetry install --with dev --no-root
+        poetry install
       # 현재 프로젝트 설지 말고 의존성만 설치하게 수정
 
     # isort를 사용하여 import 구문의 정렬 순서를 체크합니다.
