@@ -1,5 +1,5 @@
 [tool.poetry]
-name        = "moCOMOCo"
+name        = "moCOMOco"
 version     = "0.1.0"
 description = ""
 authors     = ["workface <with.you70@gmail.com>"]
@@ -8,7 +8,7 @@ license     = "MIT"
 
 # ↓ 이 부분이 핵심 ↓
 packages = [
-  { include = "moCOMOCo" }
+  { include = "moCOMOco" }
 ]
 
 [tool.poetry.dependencies]
