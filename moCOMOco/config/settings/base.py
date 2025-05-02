@@ -145,6 +145,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # 필수
+    'django_extensions',  # 이 줄 추가
 
     # 서드파티 앱
     'corsheaders',
@@ -241,7 +242,7 @@ MIDDLEWARE = [
 ]
 
 # ─── URL 설정 ───────────────────────────────────────────────
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'config.urls.urls_dev'
 
 # ─── 템플릿 설정 ───────────────────────────────────────────
 TEMPLATES = [

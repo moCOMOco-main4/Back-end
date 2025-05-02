@@ -22,11 +22,11 @@ urlpatterns = [
     # dj-rest-auth 인증 및 소셜 로그인 URL
     path('api/auth/', include('apps.app_users.urls_apps')),
 
-    # Django-allauth 소셜 로그인 콜백 URL (필요한 경우)
-    path('accounts/', include('allauth.urls')),
-
     # Swagger UI URL 패턴
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # Django-allauth 소셜 로그인 콜백 URL (필요한 경우)
+    path('accounts/', include('allauth.urls')),
+
 ]
