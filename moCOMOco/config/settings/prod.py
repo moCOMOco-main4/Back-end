@@ -5,10 +5,14 @@ DEBUG = False
 
 # 실제 운영 도메인으로 변경
 ALLOWED_HOSTS = [
-    'your-actual-domain.com',
-    'www.your-actual-domain.com',
-    # 필요한 다른 도메인 추가
+    'api.mocomoco.store',
+    '15.164.219.164',
 ]
+# 프론트엔드 도메인
+CORS_ALLOWED_ORIGINS = [
+    'https://mocomoco.store',
+]
+CORS_ALLOW_CREDENTIALS = True
 
 # PostgreSQL 데이터베이스 설정
 DATABASES = {
@@ -49,10 +53,3 @@ LOGGING = {
         },
     },
 }
-
-# CORS 설정 조정
-CORS_ALLOWED_ORIGINS = [
-    'https://your-frontend-domain.com',
-    # 다른 허용된 프론트엔드 도메인
-]
-CORS_ALLOW_CREDENTIALS = True
