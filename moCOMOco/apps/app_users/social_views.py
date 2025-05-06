@@ -5,11 +5,17 @@ from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from rest_framework import serializers
 
 from .serializers import UserDetailSerializer
 
 # 프론트엔드 URL 가져오기
 FRONTEND_URL = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+
+# 커스텀 시리얼라이저 추가
+class SocialLoginSerializer(serializers.Serializer):
+    code = serializers.CharField(required=True)
+    provider = serializers.CharField(required=False)  # provider 필드를 필수가 아닌 것으로 설정
 
 
 class KakaoLoginView(SocialLoginView):
