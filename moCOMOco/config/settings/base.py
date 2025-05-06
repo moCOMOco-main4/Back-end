@@ -111,7 +111,17 @@ DATABASES = {
 
 # ─── CORS 설정 ────────────────────────────────────────────
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
+
+# 프론트엔드 URL에서 마지막 슬래시 제거
+cleaned_frontend_url = FRONTEND_URL.rstrip('/')
+# HTTPS와 HTTP 버전 모두 허용 (개발 및 프로덕션 환경 호환성)
+if cleaned_frontend_url.startswith('https://'):
+    http_url = 'http://' + cleaned_frontend_url[8:]
+    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, http_url]
+else:
+    https_url = 'https://' + cleaned_frontend_url[7:]
+    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, https_url]
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
 CORS_ALLOW_HEADERS = [
@@ -119,7 +129,6 @@ CORS_ALLOW_HEADERS = [
     "dnt", "origin", "user-agent", "x-csrftoken", "x-requested-with"
 ]
 CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
-
 # ─── DRF 설정 ─────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
