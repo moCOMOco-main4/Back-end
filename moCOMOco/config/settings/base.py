@@ -65,9 +65,9 @@ INSTALLED_APPS = [
 
 # ─── 미들웨어 ─────────────────────────────────────────────
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -110,25 +110,24 @@ DATABASES = {
 }
 
 # ─── CORS 설정 ────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 
 # 프론트엔드 URL에서 마지막 슬래시 제거
-cleaned_frontend_url = FRONTEND_URL.rstrip('/')
+# cleaned_frontend_url = FRONTEND_URL.rstrip('/')
 # HTTPS와 HTTP 버전 모두 허용 (개발 및 프로덕션 환경 호환성)
-if cleaned_frontend_url.startswith('https://'):
-    http_url = 'http://' + cleaned_frontend_url[8:]
-    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, http_url]
-else:
-    https_url = 'https://' + cleaned_frontend_url[7:]
-    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, https_url]
-
+# if cleaned_frontend_url.startswith('https://'):
+#    http_url = 'http://' + cleaned_frontend_url[8:]
+#    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, http_url]
+# else:
+#    https_url = 'https://' + cleaned_frontend_url[7:]
+#    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, https_url]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
-CORS_ALLOW_HEADERS = [
-    "accept", "accept-encoding", "authorization", "content-type",
-    "dnt", "origin", "user-agent", "x-csrftoken", "x-requested-with"
-]
-CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+# CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
+# CORS_ALLOW_HEADERS = [
+#   "accept", "accept-encoding", "authorization", "content-type",
+#   "dnt", "origin", "user-agent", "x-csrftoken", "x-requested-with"
+# ]
+# CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 # ─── DRF 설정 ─────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -183,8 +182,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomAccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomSocialAccountAdapter'
+# ACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomAccountAdapter'
+# SOCIALACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomSocialAccountAdapter'
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 

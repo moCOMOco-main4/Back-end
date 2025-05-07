@@ -1,20 +1,25 @@
 from .base import *
 
 # 디버그 모드 비활성화
-DEBUG = False
+DEBUG = True
 
 # 실제 운영 도메인으로 변경
 ALLOWED_HOSTS = [
-    'api.mocomoco.store',
-    '15.164.219.164',
+   # 'api.mocomoco.store',
+   # '15.164.219.164',
+   # 'www.mocomoco.store',
+   # 'localhost:3000',
+   '*'
 ]
 # 프론트엔드 도메인
-CORS_ALLOWED_ORIGINS = [
-    'https://mocomoco.store',
-]
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = [
+#    'https://www.mocomoco.store',
+# ]
+# CORS_ALLOW_CREDENTIALS = True
 
 # PostgreSQL 데이터베이스 설정
+# ROOT_URLCONF = 'config.urls.urls_prod'
+
 DATABASES = {
     'default': {
         'ENGINE': get_env_variable('DB_ENGINE', 'django.db.backends.postgresql'),

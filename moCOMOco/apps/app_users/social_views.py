@@ -6,7 +6,7 @@ from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import serializers
-
+from rest_framework.response import Response
 from .serializers import UserDetailSerializer
 
 # 프론트엔드 URL 가져오기
@@ -28,7 +28,7 @@ class KakaoLoginView(SocialLoginView):
     client_class = OAuth2Client
     callback_url = settings.KAKAO_REDIRECT_URI
     permission_classes = [AllowAny]
-
+    
     def get_response(self):
         """응답 데이터에 사용자 정보 추가"""
         response = super().get_response()
