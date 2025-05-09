@@ -30,14 +30,13 @@ class KakaoLoginView(SocialLoginView):
     permission_classes = [AllowAny]
     
     def get_response(self):
-        """응답 데이터에 사용자 정보 추가"""
         response = super().get_response()
-
-        # 사용자 정보 추가
         user = self.user
+        refresh = RefreshToken.for_user(user)
+        response.data['access'] = str(refresh.access_token)
+        response.data['refresh'] = str(refresh)
         response.data['user'] = UserDetailSerializer(user).data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
-
         return response
 
 
@@ -53,14 +52,13 @@ class NaverLoginView(SocialLoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
-        """응답 데이터에 사용자 정보 추가"""
         response = super().get_response()
-
-        # 사용자 정보 추가
         user = self.user
+        refresh = RefreshToken.for_user(user)
+        response.data['access'] = str(refresh.access_token)
+        response.data['refresh'] = str(refresh)
         response.data['user'] = UserDetailSerializer(user).data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
-
         return response
 
 
@@ -76,12 +74,11 @@ class GithubLoginView(SocialLoginView):
     permission_classes = [AllowAny]
 
     def get_response(self):
-        """응답 데이터에 사용자 정보 추가"""
         response = super().get_response()
-
-        # 사용자 정보 추가
         user = self.user
+        refresh = RefreshToken.for_user(user)
+        response.data['access'] = str(refresh.access_token)
+        response.data['refresh'] = str(refresh)
         response.data['user'] = UserDetailSerializer(user).data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
-
         return response
