@@ -7,6 +7,7 @@ from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import serializers
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken  # 추가된 부분
 from .serializers import UserDetailSerializer
 
 # 프론트엔드 URL 가져오기
