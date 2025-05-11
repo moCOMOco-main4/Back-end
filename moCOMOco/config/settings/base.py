@@ -81,7 +81,6 @@ MIDDLEWARE = [
 
 # ─── URL / WSGI ───────────────────────────────────────────
 ROOT_URLCONF = 'config.urls.urls_dev'  # prod에서는 urls_prod로 오버라이드
-WSGI_APPLICATION = 'config.wsgi.application'
 
 # ─── 템플릿 ───────────────────────────────────────────────
 TEMPLATES = [
