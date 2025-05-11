@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'apps.chat',
+    'apps.notifications',
+    'channels',
 
     # 서드파티
     'corsheaders',
@@ -97,6 +100,8 @@ TEMPLATES = [
     },
 ]
 
+WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = 'config.asgi.application'
 # ─── 데이터베이스 ──────────────────────────────────────────
 DATABASES = {
     'default': {
@@ -248,5 +253,15 @@ USE_I18N = True
 USE_TZ = True
 
 # ─── 정적 파일 설정 ──────────────────────────────────────
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}

@@ -8,3 +8,4 @@ urlpatterns = [
         isinstance(url, URLPattern) and url.name in ['schema', 'swagger-ui', 'redoc']
     )
 ]
+
