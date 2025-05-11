@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'apps.chat',
     'apps.notifications',
     'channels',
-
+    'apps.posts',
     # 서드파티
     'corsheaders',
     'rest_framework',
@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.naver',
     'allauth.socialaccount.providers.github',
     'django_extensions',
-
     # 로컬 앱
     'apps.app_users.apps.UsersConfig',
 ]
