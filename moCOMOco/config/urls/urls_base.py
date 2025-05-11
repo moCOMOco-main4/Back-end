@@ -22,6 +22,11 @@ urlpatterns = [
     # dj-rest-auth 인증 및 소셜 로그인 URL
     path('api/auth/', include('apps.app_users.urls_apps')),
 
+    # 모임글 신청 API
+    path('api/posts/', include('apps.posts.urls.post_urls')),  # 모집글 관련 API
+    path('api/applications/', include('apps.posts.urls.application_urls')),  # 신청 관련 API
+    path('api/schedules/', include('apps.posts.urls.schedule_urls')),  # 일정 관련 API
+
     # Swagger UI URL 패턴
     path(
         "api/schema/swagger-ui/",
