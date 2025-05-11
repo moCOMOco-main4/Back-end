@@ -12,24 +12,16 @@ class Notification(models.Model):
         on_delete=models.CASCADE,
         db_column='User_id'
     )
-    # 나중에 주석해제
-    '''
-    rating = models.ForeignKey(
-        'ratings.Rating',
-        on_delete=models.CASCADE,
-        db_column='Rating_id',
-    )
     post = models.ForeignKey(
         'posts.Post',
         on_delete=models.CASCADE,
         db_column='Post_id',
     )
     application = models.ForeignKey(
-        'applications.Application',
+        'posts.Application',
         on_delete=models.CASCADE,
         db_column='application_id',
     )
-    '''
     chat_message = models.ForeignKey(
         ChatMessage,
         on_delete=models.CASCADE,
@@ -40,14 +32,11 @@ class Notification(models.Model):
         on_delete=models.CASCADE,
         db_column='participant_id'
     )
-    # 나중에 주석해제
-    ''' 
     schedule = models.ForeignKey(
-        'schedule.Schedule',
+        'posts.Schedule',
         on_delete=models.CASCADE,
         db_column='schedule_id',
     )
-    '''
     content = models.CharField(
         max_length=255,
         db_column='content'

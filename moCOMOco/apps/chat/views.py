@@ -45,8 +45,6 @@ class ChatRoomListView(APIView):
             unread_count = ChatMessage.objects.filter(
                 room_id=room_id
             ).exclude(chat_user_id=user.id).count()
-
-            '''
             try:
                 post_pk = int(room_id.split('_',1)[0])
                 post = get_object_or_404(Post, pk=post_pk)
@@ -55,10 +53,6 @@ class ChatRoomListView(APIView):
             except Exception:
                 post_id = None
                 post_title = ''
-            '''
-
-            post_id = None #포스트 앱 준비되면 위에 주석 해제하고 이 코드 주석처리
-            post_title = '' #포스트 앱 준비되면 위에 주석 해제하고 이 코드 주석처리
 
 
             rooms.append({

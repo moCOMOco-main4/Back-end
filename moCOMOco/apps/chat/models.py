@@ -11,14 +11,6 @@ class ChatRoomParticipant(models.Model):
         on_delete=models.CASCADE,
         db_column='User_id'
     )
-    '''
-    rating = models.ForeignKey(
-        'ratings.Rating',
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
-        db_column='Rating_id'
-    )
-    ''' #rating(평가) 완료되면 주석 풀기
     room_id = models.CharField(
         max_length=100,
         db_column='room_id'
