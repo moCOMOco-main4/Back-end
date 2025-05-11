@@ -1,25 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from rest_framework.routers import DefaultRouter
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView,  SpectacularRedocView
+from config.urls.urls_base import urlpatterns as base_urlpatterns
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
-    # API 문서 URL
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "api/schema/swagger-ui/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
-    ),
-    path(
-        "api/schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
-    ),
-    path('chat/', include('apps.chat.urls')),
-    path('notifications/', include('apps.notifications.urls'))
-]
+# 개발용 URL 구성은 base와 동일하게 사용
+urlpatterns = base_urlpatterns
+
