@@ -3,11 +3,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 from .serializers import (
     UserDetailSerializer, UserUpdateSerializer, PositionSerializer,
 )
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 
 # Position 매핑
 POSITION_NAMES = {
@@ -43,6 +43,7 @@ class UserDetailView(APIView):
         serializer = UserDetailSerializer(request.user)
         return Response(serializer.data)
 
+
     def patch(self, request):
         # self를 사용하므로 static 메서드로 변환하지 않음
         serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
@@ -65,6 +66,34 @@ class UserDetailView(APIView):
         # self를 사용하므로 static 메서드로 변환하지 않음
         request.user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_profile_image(request):
+    """프로필 이미지 업로드 전용 엔드포인트"""
+    if 'profile_image_file' in request.FILES:
+        uploaded_file = request.FILES['profile_image_file']
+        # 이미지 저장 경로 설정
+        fs = FileSystemStorage(location=settings.MEDIA_ROOT / 'profile_images')
+        filename = fs.save(f"user_{request.user.id}_{uploaded_file.name}", uploaded_file)
+        # URL 생성 및 저장
+        file_url = f"{settings.MEDIA_URL}profile_images/{filename}"
+
+        # 사용자 프로필 업데이트
+        user = request.user
+        user.profile_image = file_url
+        user.save(update_fields=['profile_image'])
+
+        return Response({
+            'profile_image': file_url,
+            'user': UserDetailSerializer(user).data,
+            'message': '프로필 이미지가 업로드되었습니다.'
+        }, status=status.HTTP_200_OK)
+
+    return Response({
+        'error': '이미지 파일이 제공되지 않았습니다.'
+    }, status=status.HTTP_400_BAD_REQUEST)
 
 class PositionView(APIView):
     """사용자 포지션 관리 API 뷰"""
