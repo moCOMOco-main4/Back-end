@@ -58,4 +58,4 @@ GitHub Actions를 통한 자동 테스트 및 코드 품질 검사
 [django,python,git,git hub,postagesql,sqlite3,aws]
 =======
 # MOCOMOCO/backend_project
->>>>>>> 3bd72c25393269372095372aeb1b2930027d19fc
+
