@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions , generics , status
 from .models import ChatRoomParticipant, ChatMessage
-#from apps.posts.models import Post
+from apps.posts.models import Post
 from .serializers import ChatRoomSerializer , ChatMessageSerializer , ChatMessageCreateSerializer
 from rest_framework.exceptions import PermissionDenied
 
