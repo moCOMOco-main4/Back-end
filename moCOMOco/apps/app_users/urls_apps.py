@@ -28,4 +28,7 @@ urlpatterns = [
     path('users/me/', views.UserDetailView.as_view(), name='user_detail'),
     path('users/me/delete/', views.UserDetailView.as_view(), name='user_delete'),
     path('users/position/', views.PositionView.as_view(), name='user_position'),
+
+    # 이미지 업로드 전용 엔드포인트 추가
+    path('users/me/upload-image/', views.upload_profile_image, name='upload_profile_image'),
 ]
