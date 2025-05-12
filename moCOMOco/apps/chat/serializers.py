@@ -25,7 +25,10 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         ]
     # noinspection PyMethodMayBeStatic
     def get_nickname(self, obj):
-        return getattr(obj.chat_user, 'nickname', obj.chat_user.username)
+        user = obj.chat_user
+        if hasattr(user, 'nickname') and user.nickname:
+            return user.nickname
+        return user.get_username()
 
 class ChatMessageCreateSerializer(serializers.ModelSerializer):
     content = serializers.CharField()
