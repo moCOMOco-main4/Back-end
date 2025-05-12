@@ -1,0 +1,31 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - dev  # dev 브랜치 푸시 시 동작
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # GitHub가 제공하는 리눅스 서버에서 실행
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3  # 현재 리포지토리 코드 가져오기
+
+    - name: SSH and Deploy
+      uses: appleboy/ssh-action@v1.0.3  # SSH 접속 액션
+      with:
+        host: ${{ secrets.EC2_HOST }}  # EC2 IP
+        username: ${{ secrets.EC2_USER }}  # ubuntu 계정
+        key: ${{ secrets.EC2_SSH_KEY }}  # 비공개 키
+        script: |  # EC2에서 실행할 명령어 모음
+          cd ~/Back-end
+          git pull origin dev
+          source ~/.bashrc
+          source $(poetry env info --path)/bin/activate
+          poetry install
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+          sudo systemctl restart gunicorn
+          sudo systemctl reload nginx
