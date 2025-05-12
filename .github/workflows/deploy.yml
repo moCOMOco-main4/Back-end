@@ -3,71 +3,23 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - dev  # dev 브랜치 푸시 시 동작
+      - dev
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # GitHub가 제공하는 리눅스 서버에서 실행
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3  # 현재 리포지토리 코드 가져오기
+      uses: actions/checkout@v3
 
     - name: SSH and Deploy
-      uses: appleboy/ssh-action@v1.0.3  # SSH 접속 액션
+      uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ 15.164.219.164 }}  # EC2 IP
-        username: ${{ ubuntu }}  # ubuntu 계정
-        key: ${{ -----BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn
-NhAAAAAwEAAQAAAgEArADuo5USkLOme2Z9khg9urrYkTFaPBiDdHLIvvBn3UVH+Divqhfe
-ZPkCXhnmTgLkjiItVX4kwErYjiQqdMqw8BggSWEooAuUtxlTqrqOvaQXXG0U0akWU08wZP
-Wi73xSdr++D9d/T/T6QaD+ahRZqWoulId6oUGlCNiNO2P71WwcPVuyme8RgFIYvWt77hxu
-Vcs0jtH7ntxQ4EhmO51/Pfr7Z0tyRTAQCwTqMUZT0GoBUlbraM5lO4uSzH/R/OSMaNnvLh
-c2kuNHuLhOo7nbiQKyI3YC5hMmk60UyU2pTtEzbrWWAWefefwo9XI9o213n3jGJLxK7GPW
-IQfpEfHMIlxX5VPtqzf4qLcIXIBi6iQt1ouAcwTFBk7xbpSMyRn3chLtG07CNLBEyPNhZ4
-JeQc7S5KekDoUdy6sO/mts94sB0ICT2y/nsHnhjXrV8hyIFtbPgct/YkrSCTDPR/9Me7NJ
-x2RSMmvvt3YreLJLypKz+SV6pvWxtDBblp+41lBl48UvYnSP5aSTHNIRiX/0+/s2ZaBLzC
-59avg8y91fstJTMDzigKx8P0oUbiZUUgNopfPMNXprlY9COD1V13FOw7vyeAlDuzumxC9Y
-OKirDQfB55dQo4gDcC6Lc6B9z/nyzoTv92GXt34yd2kZsjQycPoHaDPDZ4u9eSrELctJje
-kAAAdAgDwuUoA8LlIAAAAHc3NoLXJzYQAAAgEArADuo5USkLOme2Z9khg9urrYkTFaPBiD
-dHLIvvBn3UVH+DivqhfeZPkCXhnmTgLkjiItVX4kwErYjiQqdMqw8BggSWEooAuUtxlTqr
-qOvaQXXG0U0akWU08wZPWi73xSdr++D9d/T/T6QaD+ahRZqWoulId6oUGlCNiNO2P71Wwc
-PVuyme8RgFIYvWt77hxuVcs0jtH7ntxQ4EhmO51/Pfr7Z0tyRTAQCwTqMUZT0GoBUlbraM
-5lO4uSzH/R/OSMaNnvLhc2kuNHuLhOo7nbiQKyI3YC5hMmk60UyU2pTtEzbrWWAWefefwo
-9XI9o213n3jGJLxK7GPWIQfpEfHMIlxX5VPtqzf4qLcIXIBi6iQt1ouAcwTFBk7xbpSMyR
-n3chLtG07CNLBEyPNhZ4JeQc7S5KekDoUdy6sO/mts94sB0ICT2y/nsHnhjXrV8hyIFtbP
-gct/YkrSCTDPR/9Me7NJx2RSMmvvt3YreLJLypKz+SV6pvWxtDBblp+41lBl48UvYnSP5a
-STHNIRiX/0+/s2ZaBLzC59avg8y91fstJTMDzigKx8P0oUbiZUUgNopfPMNXprlY9COD1V
-13FOw7vyeAlDuzumxC9YOKirDQfB55dQo4gDcC6Lc6B9z/nyzoTv92GXt34yd2kZsjQycP
-oHaDPDZ4u9eSrELctJjekAAAADAQABAAACAHo0B1hNd207VhLiVGDRvDnIukkdyUBdIjg/
-vQR7hS+eI23lyFiOsMEIcXgt6oSOZZfeDFtrTe0YwBbs9wUXZPKQEZBQ6S4cTEJyShFIjl
-WKGdbe4SW8flIeNwHjyylfKK+Ztw1GS/ugz5SFL3xqjPFisUlxn9yl6P0J7f2+IZQWRVIK
-ri/TvJlwuocJsHkR1go6X1MBOUY6vXM7vPaqBVch1DAlWEBzz1Ik4ca0cqPmTJ4VhxdlXG
-Mb3OZSAf0s2906yUXz1CA0PiatO6HzUFhdg/bRx2lzPbs6A0SqWpnW5DXJ6ZOB7bobP3Zy
-/fv4sD6q7gv3gzvECsRY/Gx1YFP3EsKaRjtzdU/JwWHOSkl7cWr1fDzqav4ZlkaOv6Mof3
-AqRwdECfegLgIuzGsucbO0WDVhcxtLl6vmwnIzZJGietScIkZSECpjC4ccoAKnOFpzNB0/
-67IjzdeMfyEkZfknDJ0KXRX2zLlXYE3GU1LRAfhXEoDYUk1BIo3cbOnecVHCJsYILKAGQj
-2oA5pterZ2sXllZQesuZHwioM8a52cXmiyUIr68OYCApdm1+twmga7ehWQZbw1m53b6PhF
-RZbKl+nw/9KWY31ov4ZYoeG4xzOrNUEP34/NbteEkNjo4QRjcH00ynGchA1yZmZITFLKZe
-u9PHxZQYj/HGq9EKopAAABAFp/ZARHg2dka4PEGZ5U6WtpxynU1qiaH+PIL4QF/jEGwXAE
-/vuIXV1lMIKytk7Ze+wkJSb53RCntmZtVghyrT6qiHsH+z871q1SdKdc5tnhlH2CTSkUiG
-HiZk4KrtLJYEhR5qEA3yy7a8zAnfZK83S5NaKxZC9NH0nhypK7QPoEc1YYNPWyNL7Ovv5x
-CE/CJZqvEDlJRkdWStioc14MzVTuUNJubiE5C5Bt5qAgc7Oc8x77apiT4JTbkaHRHAmV64
-NRIU8FkAQbLKrOGqs1AUs3SVWUdCSsptaUsplOgKNUF1Zn6nU+94av0wPltjsuK5psbMca
-vKHlIyuoMo5Ph7AAAAEBANWi/JiCSdywcFaChus4d26i8z24K2L/F59fI0dHkYa6nT1y4q
-lSkPE7Vn/7sOu89UzXGyWL2kKFY8L+BCI8M0nyr5/LQzDihzbINKCoOQddmgDcAZPAjYTD
-XvXz0y5nhDGYs4G0ZQTQVYFl9xH4F4yqR13tpBVqpNmFHVGfa7IsHKXWyF4m7gJZCitJIj
-r+NOImkwyHgYIWEdwXwcjYzpWc5Lp6SSWnfrnWoo6b8H4TNq6dwYfM0jCzAh9/x9pi9Gx8
-/jOJeUW2mGGSBsFj5jCTg6f5Y9dIuC6ckidQrKeV0GGKcsPyEzvD1VyO5Z2Hwz2thslfyv
-PVBQ7cYvBLvqcAAAEBAM4cfntwifpTTCRjxVUO3wLZ4bGFdFEB5CX8flyvkmFP5RwTpvmj
-K04kXQ8WcUlKKj5hSydrCJoQXXJlLjMHdauZAJ8Id7ATmLkLJnei7y07GsOYeQPfJfi3ZH
-2nn2rd1TRE/yFWYYVTN6okmu+R2puRw3/c1+NIwXIs1Oh66s2UTrqpuBRk5c3ebpEA7o8x
-O7b3TQC/JpBKdSvd2haOd7pSATdAxE0t4ZzZwY5r2LoCCHABueFWkgtlnbltIpyHqDUQfC
-DG9d3YZg9ORsuON67U25TFnXV0/ouRppIO97OlZSAJtUcIYmM8P8ZBihoy2SfEm5slAJI+
-5HaozsA68O8AAAAJZ2l0aHViLWNpAQI=
------END OPENSSH PRIVATE KEY----- }}  # 비공개 키
-        script: |  # EC2에서 실행할 명령어 모음
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
           cd ~/Back-end
           git pull origin dev
           source ~/.bashrc
