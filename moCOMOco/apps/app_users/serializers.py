@@ -5,8 +5,7 @@ from .models import User
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'nickname', 'name', 'phone', 'birthday',
-                  'address', 'github_url', 'portfolio_url', 'intro',
+        fields = ['id', 'email', 'nickname', 'phone', 'github_url', 'portfolio_url', 'intro',
                   'position', 'position_name', 'provider', 'profile_image']
         read_only_fields = ['id', 'email', 'provider']
 
@@ -18,7 +17,7 @@ class UserBasicSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['nickname', 'birthday', 'phone', 'address', 'github_url',
+        fields = ['nickname', 'phone', 'github_url',
                  'portfolio_url', 'intro']
 
 class PositionSerializer(serializers.Serializer):
