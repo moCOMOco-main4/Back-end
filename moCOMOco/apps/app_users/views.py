@@ -1,3 +1,4 @@
+from django.core.files.storage import FileSystemStorage
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import (
     UserDetailSerializer, UserUpdateSerializer, PositionSerializer,
 )
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 # Position 매핑
 POSITION_NAMES = {
@@ -43,6 +46,16 @@ class UserDetailView(APIView):
     def patch(self, request):
         # self를 사용하므로 static 메서드로 변환하지 않음
         serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
+        # 이피지 파일 처리 기능 추가
+        if 'profile_image_file' in request.FILES:
+            uploaded_file =  request.FILES['profile_image_file']
+            # 이미지 저장 경로 설정
+            fs = FileSystemStorage(location=settings.MEDIA_ROOT / 'profile_images')
+            filename = fs.save(f"user_{request.user.id}_{uploaded_file.name}", uploaded_file)
+            #URL 생성 및 저장
+            file_url = f"{settings.MEDIA_URL}profile_images/{filename}"
+            request.data['profile_image'] = file_url
+
         if serializer.is_valid():
             serializer.save()
             return Response(UserDetailSerializer(request.user).data)
