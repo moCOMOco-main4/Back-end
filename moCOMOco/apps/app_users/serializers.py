@@ -18,7 +18,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['nickname', 'phone', 'github_url',
-                 'portfolio_url', 'intro']
+                 'portfolio_url', 'intro', 'profile_image']
 
 class PositionSerializer(serializers.Serializer):
     position = serializers.IntegerField()
