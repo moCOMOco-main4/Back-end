@@ -29,7 +29,7 @@ class ChatRoomListView(APIView):
             )
             # nickname 필드가 있으면 그걸, 없으면 username 사용
             nicknames = [
-                getattr(p.user, 'nickname', p.user.username)
+                getattr(p.user, 'nickname', p.user.get_username())
                 for p in participants_qs
             ]
 
