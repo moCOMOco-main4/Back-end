@@ -11,8 +11,9 @@ class ChatRoomSerializer(serializers.Serializer):
     participants = serializers.ListField(child=serializers.CharField())
 
 class ChatMessageSerializer(serializers.ModelSerializer):
-    # nickname 필드가 있으면 그걸, 없으면 username tkdyd
+    # nickname 필드와 프로필 이미지 URL
     nickname = serializers.SerializerMethodField()
+    profile_image = serializers.SerializerMethodField()
 
     class Meta:
         model = ChatMessage
@@ -20,7 +21,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
             'ChatMessage_id',
             'chat_user_id',
             'nickname',
-            'content',
+            'profile_image',
             'created_at',
         ]
     # noinspection PyMethodMayBeStatic
@@ -29,6 +30,12 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         if hasattr(user, 'nickname') and user.nickname:
             return user.nickname
         return user.get_username()
+
+    def get_profile_image(self, obj):
+        user = obj.chat_user
+        if hasattr(user, 'profile_image') and user.profile_image:
+            return user.profile_image.url
+        return None
 
 class ChatMessageCreateSerializer(serializers.ModelSerializer):
     content = serializers.CharField()
