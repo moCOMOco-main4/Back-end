@@ -6,7 +6,7 @@ from .models import ChatRoomParticipant, ChatMessage
 from apps.posts.models import Post
 from .serializers import ChatRoomSerializer , ChatMessageSerializer , ChatMessageCreateSerializer
 from rest_framework.exceptions import PermissionDenied
-
+from apps.notifications.services import NotificationService
 
 class ChatRoomListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -94,6 +94,8 @@ class ChatMessageCreateView(generics.CreateAPIView):
         if not ChatRoomParticipant.objects.filter(user=user, room_id=room_id).exists():
             raise PermissionDenied("해당 채팅방의 참여자가 아닙니다.")
         serializer.save(room_id=room_id, chat_user=user)
+        message = serializer.save(room_id=room_id, chat_user=user) # 메시지를 저장하고 , 반환된 인스턴스를 변수에 받음
+        NotificationService.send_chat_message_notification(message) # 저장된 메시지 정보로 알림을 자동 생성
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)

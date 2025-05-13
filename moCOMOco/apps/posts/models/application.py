@@ -13,7 +13,11 @@ class Application(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='applications')
     created_at = models.DateTimeField(auto_now_add=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(
+        max_length=15,
+        choices=ROLE_CHOICES,
+        default='backend',
+    )
 
     class Meta:
         constraints = [
