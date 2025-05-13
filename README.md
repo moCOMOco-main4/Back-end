@@ -56,6 +56,6 @@ GitHub Actions를 통한 자동 테스트 및 코드 품질 검사
 
 라이선스
 [django,python,git,git hub,postagesql,sqlite3,aws]
-=======
+
 # MOCOMOCO/backend_project
 
