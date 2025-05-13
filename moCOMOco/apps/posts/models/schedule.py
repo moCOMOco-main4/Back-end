@@ -1,5 +1,5 @@
 from django.db import models
-from apps.posts.models.post import Post
+from apps import Post
 
 class Schedule(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='schedules')

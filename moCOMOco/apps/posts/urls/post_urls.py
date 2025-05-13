@@ -1,15 +1,15 @@
 from django.urls import path
-from apps.posts.views.post_views import (
+from apps import (
     PostListView, PostDetailView, MyPostListView,
     PostUpdateView, PostDeleteView, PostCreateView,
 )
-from apps.posts.views.application_views import (
+from apps import (
     ApplicationCreateView, ApplicationCancelView, MyApplicationListView,
 )
-from apps.posts.views.like_views import (
+from apps import (
     PostLikeCreateView, MyLikedPostListView,
 )
-from apps.posts.views.schedule_views import (
+from apps import (
     ScheduleCreateView, ScheduleUpdateView,
     ScheduleDeleteView, ScheduleListView,
 )

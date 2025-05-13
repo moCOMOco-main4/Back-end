@@ -6,13 +6,13 @@ from django.http import Http404
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from apps.posts.models import Post, Application, Schedule, PostLike
-from apps.posts.serializers.application_serializers import (
+from apps import Post, Application, Schedule, PostLike
+from apps import (
     ApplicationCreateSerializer,
     MyApplicationSerializer,
 )
-from apps.posts.serializers.post_serializers import PostListSerializer
-from apps.posts.serializers.schedule_serializers import (
+from apps import PostListSerializer
+from apps import (
     ScheduleCreateSerializer,
     ScheduleUpdateSerializer,
     ScheduleListSerializer,

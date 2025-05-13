@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from apps.posts.models.post import Post
-from apps.posts.models.application import Application
-from apps.posts.models.post_like import PostLike
-from apps.app_users.models import User
+from apps import Post
+from apps import Application
+from apps import PostLike
+from apps import User
 
 # 모집글 등록용
 class PostCreateSerializer(serializers.ModelSerializer):

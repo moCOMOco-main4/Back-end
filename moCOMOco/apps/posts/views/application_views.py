@@ -4,12 +4,12 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.views import APIView
 from django.http import Http404
 
-from apps.posts.models import Post, Application
-from apps.posts.serializers.application_serializers import (
+from apps import Post, Application
+from apps import (
     ApplicationCreateSerializer,
     MyApplicationSerializer,
 )
-from apps.notifications.services import NotificationService
+from apps import NotificationService
 
 # 모집글 조회 헬퍼
 class PostAccessMixin:

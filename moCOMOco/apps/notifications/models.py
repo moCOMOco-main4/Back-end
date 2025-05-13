@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from apps.chat.models import ChatMessage, ChatRoomParticipant
+from apps import ChatMessage, ChatRoomParticipant
 
 class Notification(models.Model):
     Notification_id = models.AutoField(

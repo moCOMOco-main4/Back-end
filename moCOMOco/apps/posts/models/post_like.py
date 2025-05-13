@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from apps.posts.models.post import Post
+from apps import Post
 
 class PostLike(models.Model):
     user = models.ForeignKey(

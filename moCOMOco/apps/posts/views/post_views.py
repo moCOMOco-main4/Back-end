@@ -2,8 +2,8 @@ from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from apps.posts.models.post import Post
-from apps.posts.serializers.post_serializers import (
+from apps import Post
+from apps import (
     PostListSerializer,
     PostDetailSerializer,
     PostUpdateSerializer,
@@ -11,6 +11,7 @@ from apps.posts.serializers.post_serializers import (
 )
 from drf_spectacular.utils import extend_schema  # Swagger 문서 연결용
 
+# 모집글 생성
 class PostCreateView(generics.CreateAPIView):
     serializer_class = PostCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -24,10 +25,9 @@ class PostCreateView(generics.CreateAPIView):
 @extend_schema(responses=PostListSerializer)
 class PostListView(generics.ListAPIView):
     serializer_class = PostListSerializer
-    queryset = Post.objects.all()
 
     def get_queryset(self):
-        qs = self.queryset
+        qs = Post.objects.all()
         category = self.request.query_params.get('category')
         is_closed = self.request.query_params.get('is_closed')
 
@@ -66,7 +66,9 @@ class MyPostListView(generics.ListAPIView):
 class PostUpdateView(generics.UpdateAPIView):
     serializer_class = PostUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Post.objects.all()
+
+    def get_queryset(self):
+        return Post.objects.all()
 
     def get_object(self):
         post = super().get_object()
@@ -81,7 +83,9 @@ class PostUpdateView(generics.UpdateAPIView):
 @extend_schema(responses=None)
 class PostDeleteView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Post.objects.all()
+
+    def get_queryset(self):
+        return Post.objects.all()
 
     def get_object(self):
         post = super().get_object()

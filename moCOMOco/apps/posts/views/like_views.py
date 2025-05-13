@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from django.http import Http404
 
-from apps.posts.models.post import Post
-from apps.posts.models.post_like import PostLike
-from apps.posts.serializers.post_serializers import PostListSerializer
+from apps import Post
+from apps import PostLike
+from apps import PostListSerializer
 
 # 모집글 조회 헬퍼
 class PostAccessMixin:
