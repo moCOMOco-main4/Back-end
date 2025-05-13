@@ -35,7 +35,7 @@ bashcreatedb django_db
 .env.example 파일을 복사하여 실제 값으로 수정
 
 마이그레이션 및 서버 실행
-bashpython manage.py makemigrations
+
 python manage.py migrate
 python manage.py runserver
 개발 가이드라인
