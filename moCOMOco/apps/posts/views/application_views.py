@@ -9,6 +9,7 @@ from apps.posts.serializers.application_serializers import (
     ApplicationCreateSerializer,
     MyApplicationSerializer,
 )
+from apps.notifications.services import NotificationService
 
 # 모집글 조회 헬퍼
 class PostAccessMixin:
@@ -33,6 +34,8 @@ class ApplicationCreateView(PostAccessMixin, generics.CreateAPIView):
         user = self.request.user
         post = self.get_post()
         role = self.request.data.get('role')
+        application = serializer.save(user=user, post=post, role=role)
+        NotificationService.send_apply_created(application)
 
         # 모집 마감 여부
         if post.is_closed:

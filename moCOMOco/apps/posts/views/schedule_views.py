@@ -15,6 +15,7 @@ from apps.posts.serializers.schedule_serializers import (
     ScheduleUpdateSerializer,
     ScheduleListSerializer,
 )
+from apps.notifications.services import NotificationService
 
 # 모집글 조회 헬퍼
 class PostAccessMixin:
@@ -122,7 +123,8 @@ class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
         post = self.get_post(self.kwargs['post_id'])
         if post.user != self.request.user:
             raise PermissionDenied("작성자만 일정을 등록할 수 있습니다.")
-        serializer.save(post=post)
+        schedule = serializer.save(post=post)
+        NotificationService.send_schedule_created(schedule)
 
 
 # 일정 수정

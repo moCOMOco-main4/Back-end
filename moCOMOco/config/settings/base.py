@@ -42,11 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'apps.chat',
+    'apps.chat.apps.ChatConfig',
     'apps.notifications',
     'channels',
     'apps.posts',
-    'apps.posts.apps.PostsConfig',
     # 서드파티
     'corsheaders',
     'rest_framework',

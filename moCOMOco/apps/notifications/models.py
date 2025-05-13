@@ -16,11 +16,13 @@ class Notification(models.Model):
         'posts.Post',
         on_delete=models.CASCADE,
         db_column='Post_id',
+        null=True, blank=True,
     )
     application = models.ForeignKey(
         'posts.Application',
         on_delete=models.CASCADE,
         db_column='application_id',
+        null=True, blank=True,
     )
     chat_message = models.ForeignKey(
         ChatMessage,
@@ -36,6 +38,7 @@ class Notification(models.Model):
         'posts.Schedule',
         on_delete=models.CASCADE,
         db_column='schedule_id',
+        null=True, blank=True,
     )
     content = models.CharField(
         max_length=255,
