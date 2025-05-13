@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from django.http import Http404
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 from apps.posts.models import Post, Application, Schedule, PostLike
 from apps.posts.serializers.application_serializers import (
@@ -16,7 +18,40 @@ from apps.posts.serializers.schedule_serializers import (
     ScheduleListSerializer,
 )
 
-# 모집글 조회 헬퍼
+# ===== 시그널: 자동 모집 마감/재오픈 =====
+
+@receiver(post_save, sender=Application)
+def auto_close_post_if_full(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    post = instance.post
+    role = instance.role
+
+    max_count = post.roles.get(role, 0)
+    current_count = Application.objects.filter(post=post, role=role).count()
+    total_current = Application.objects.filter(post=post).count()
+    total_max = sum(post.roles.values())
+
+    if current_count >= max_count or total_current >= total_max:
+        if not post.is_closed:
+            post.is_closed = True
+            post.save()
+
+
+@receiver(post_delete, sender=Application)
+def auto_reopen_post_if_not_full(sender, instance, **kwargs):
+    post = instance.post
+    total_current = Application.objects.filter(post=post).count()
+    total_max = sum(post.roles.values())
+
+    if total_current < total_max and post.is_closed:
+        post.is_closed = False
+        post.save()
+
+
+# ===== 공통 Mixin =====
+
 class PostAccessMixin:
     def get_post(self, post_id):
         try:
@@ -27,7 +62,6 @@ class PostAccessMixin:
 
 # ===== 신청 관련 =====
 
-# 참여 신청
 class ApplicationCreateView(PostAccessMixin, generics.CreateAPIView):
     serializer_class = ApplicationCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -58,7 +92,6 @@ class ApplicationCreateView(PostAccessMixin, generics.CreateAPIView):
         serializer.save(user=user, post=post, role=role)
 
 
-# 참여 취소
 class ApplicationCancelView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -76,7 +109,6 @@ class ApplicationCancelView(PostAccessMixin, APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# 내가 신청한 모집글 목록 조회
 class MyApplicationListView(generics.ListAPIView):
     serializer_class = MyApplicationSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -87,7 +119,6 @@ class MyApplicationListView(generics.ListAPIView):
 
 # ===== 좋아요 관련 =====
 
-# 즐겨찾기 추가
 class PostLikeCreateView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -102,7 +133,6 @@ class PostLikeCreateView(PostAccessMixin, APIView):
         return Response({"message": "즐겨찾기에 추가되었습니다."}, status=status.HTTP_201_CREATED)
 
 
-# 내가 즐겨찾기한 모집글 목록
 class MyLikedPostListView(generics.ListAPIView):
     serializer_class = PostListSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -113,7 +143,6 @@ class MyLikedPostListView(generics.ListAPIView):
 
 # ===== 일정 관련 =====
 
-# 일정 등록
 class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
     serializer_class = ScheduleCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -125,7 +154,6 @@ class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
         serializer.save(post=post)
 
 
-# 일정 수정
 class ScheduleUpdateView(generics.UpdateAPIView):
     serializer_class = ScheduleUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -138,7 +166,6 @@ class ScheduleUpdateView(generics.UpdateAPIView):
         return schedule
 
 
-# 일정 삭제
 class ScheduleDeleteView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Schedule.objects.all()
@@ -150,7 +177,6 @@ class ScheduleDeleteView(generics.DestroyAPIView):
         return schedule
 
 
-# 모집글 일정 목록 조회
 class ScheduleListView(generics.ListAPIView):
     serializer_class = ScheduleListSerializer
 

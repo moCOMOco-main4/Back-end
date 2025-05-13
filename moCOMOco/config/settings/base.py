@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.notifications',
     'channels',
     'apps.posts',
+    'apps.posts.apps.PostsConfig',
     # 서드파티
     'corsheaders',
     'rest_framework',

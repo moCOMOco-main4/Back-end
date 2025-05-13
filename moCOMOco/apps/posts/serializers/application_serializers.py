@@ -1,46 +1,54 @@
 from rest_framework import serializers
-from apps.posts.models import Application
+from apps.posts.models.application import Application
 
-
-# 신청자 리스트 시리얼라이저 (내 글에 신청한 사용자용)
-class ApplicationSimpleSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-
-    class Meta:
-        model = Application
-        fields = ['id', 'username', 'role', 'created_at', 'status']
-
-
-# 내가 신청한 모집글 목록용
-class MyApplicationSerializer(serializers.ModelSerializer):
-    post_id = serializers.IntegerField(source='post.id', read_only=True)
-    post_title = serializers.CharField(source='post.title', read_only=True)
-
-    class Meta:
-        model = Application
-        fields = ['id', 'post_id', 'post_title', 'role', 'created_at', 'status']
-
-
-# 신청 생성용
+# 모집 신청 생성용
 class ApplicationCreateSerializer(serializers.ModelSerializer):
+    role = serializers.CharField()
+
     class Meta:
         model = Application
-        fields = ['post', 'role']
-        # user, created_at, status는 view 또는 model에서 처리됨
+        fields = ['role']  # user, post는 view에서 context로 전달됨
 
-# 수락 거절
-class ApplicationStatusUpdateSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        role = attrs['role']
+        user = self.context['request'].user
+        post = self.context['post']
+
+        if post.is_closed:
+            raise serializers.ValidationError("모집이 마감된 글입니다.")
+        if role not in post.roles:
+            raise serializers.ValidationError(f"{role} 역할은 존재하지 않습니다.")
+
+        max_count = post.roles[role]
+        current_count = Application.objects.filter(post=post, role=role).count()
+        if current_count >= max_count:
+            raise serializers.ValidationError(f"{role} 역할은 이미 마감되었습니다.")
+
+        if Application.objects.filter(user=user, post=post).exists():
+            raise serializers.ValidationError("이미 신청하셨습니다.")
+
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        post = self.context['post']
+        role = validated_data['role']
+        return Application.objects.create(user=user, post=post, role=role)
+
+
+# 내가 신청한 글 목록 조회
+class MyApplicationSerializer(serializers.ModelSerializer):
+    post_id = serializers.IntegerField(source='post.id')
+    title = serializers.CharField(source='post.title')
+    category = serializers.CharField(source='post.category')
+    is_closed = serializers.BooleanField(source='post.is_closed')
+    date = serializers.DateTimeField(source='post.date')
+    place_name = serializers.CharField(source='post.place_name')
+    role = serializers.CharField()
+
     class Meta:
         model = Application
-        fields = ['status']
-        extra_kwargs = {
-            'status' : {
-                'read_only': False,
-                'help_text' : "'accepted' or 'rejected' 중 하나만 선택"
-            }
-        }
-
-        def validate_state(self, value):
-            if value not in ['accepted', 'rejected']:
-                raise serializers.ValidationError("상태는 'accepted' or 'rejected' 만 가능")
-            return value
+        fields = [
+            'post_id', 'title', 'category', 'date', 'place_name',
+            'role', 'is_closed', 'created_at',
+        ]
