@@ -50,11 +50,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # 기본 사용자 정보
     email = models.EmailField(unique=True) # 이메일 을 고유 식별자 로 사용
-    #name = models.CharField(max_length=100, null=True, blank=True) # 사용자 이름
+    name = models.CharField(max_length=100, null=True, blank=True) # 사용자 이름
     nickname = models.CharField(max_length=20,) # 사용자 닉네임
     profile_image = models.URLField(max_length=500, null=True, blank=True)  # 프로필 이미지 URL
     phone = models.CharField(max_length=20, null=True, blank=True) # 사용자 핸드폰 번호
-    #birthday = models.DateField(null=True, blank=True) # 사용자 태어난 날짜
+    #birthday = models.DateField(null=True, blank=True) # 사용자 태어난 날짜S
     #address = models.CharField(max_length=200, null=True, blank=True) # 사용자 거주지
     github_url = models.URLField(null=True, blank=True) # 사용자 github 주소 등록
     portfolio_url = models.URLField(null=True, blank=True) # 사용자 사진 등록
