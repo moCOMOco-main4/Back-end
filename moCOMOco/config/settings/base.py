@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.naver',
     'allauth.socialaccount.providers.github',
     'django_extensions',
+    'storages',  # S3 사용을 위해 추가
     # 로컬 앱
     'apps.app_users.apps.UsersConfig',
 ]
@@ -100,6 +101,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = 'config.asgi.application'
+
 # ─── 데이터베이스 ──────────────────────────────────────────
 DATABASES = {
     'default': {
@@ -114,6 +116,7 @@ DATABASES = {
 
 # ─── CORS 설정 ────────────────────────────────────────────
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # 프론트엔드 URL에서 마지막 슬래시 제거
 # cleaned_frontend_url = FRONTEND_URL.rstrip('/')
@@ -124,13 +127,13 @@ CORS_ALLOW_ALL_ORIGINS = True
 # else:
 #    https_url = 'https://' + cleaned_frontend_url[7:]
 #    CORS_ALLOWED_ORIGINS = [cleaned_frontend_url, https_url]
-CORS_ALLOW_CREDENTIALS = True
 # CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
 # CORS_ALLOW_HEADERS = [
 #   "accept", "accept-encoding", "authorization", "content-type",
 #   "dnt", "origin", "user-agent", "x-csrftoken", "x-requested-with"
 # ]
 # CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+
 # ─── DRF 설정 ─────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -255,10 +258,16 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ─── 미디어 파일 설정 ──────────────────────────────────────
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
+# ─── 미디어 파일 설정 (이미지만 S3에 저장) ───────────────
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_ACCESS_KEY_ID = get_env_variable("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = get_env_variable("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = get_env_variable("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = get_env_variable("AWS_S3_REGION_NAME", "ap-northeast-2")
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+# MEDIA_ROOT는 로컬에 사용하지 않음 (참고용 주석)
+# MEDIA_ROOT = BASE_DIR / 'media'
 
 CHANNEL_LAYERS = {
     'default': {
