@@ -40,10 +40,6 @@ python manage.py migrate
 python manage.py runserver
 개발 가이드라인
 
-Black을 사용한 코드 포맷팅
-Isort를 사용한 import 정렬
-pytest를 사용한 테스트
-
 CI/CD
 
 GitHub Actions를 통한 자동 테스트 및 코드 품질 검사
