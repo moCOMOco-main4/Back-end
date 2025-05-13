@@ -71,5 +71,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             user.position = 1
             user.position_name = "백엔드(BE)"
 
-        user.save()
+        #모든 필드가 제대로 설정되었는지 확인
+        print(f"[DEBUG] Final user data before save: provider = {user.provider},"
+              f"nickname = {user.nickname}, name = {user.name}, position = {user.position}")
+
+        # 변경된 필드 명시적으로 저장
+        user.save(update_fields=['provider', 'nickname', 'name', 'profile_image', 'position', 'position_name'])
+
         return user

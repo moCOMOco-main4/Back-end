@@ -6,7 +6,6 @@ from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import serializers
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken  # 추가된 부분
 from .serializers import UserDetailSerializer
 
@@ -33,11 +32,39 @@ class KakaoLoginView(SocialLoginView):
     def get_response(self):
         response = super().get_response()
         user = self.user
+
+        # 사용자 정보 확인 및 업데이트 (필요시)
+        if not user.provider or user.provider != 'kakao':
+            user.provider = 'kakao'
+            user .save(update_fields=['provider'])
+            print(f"[DEBUG] Updated Kakao user provider: {user.provider}")
+
+        # 사용자 정보 확인을 위해 다시 DB에서 조회
+        user = user.__class__.objects.get(pk=user.pk)
+
+        #필수 정보가 없는 경우 설정
+        if not user.nickname or  user.nickname == "":
+            user.nickname = f"Kakao_{user.id}"
+            user.save(update_fields=['nickname'])
+
+        if not user.position_name:
+            user.position = 1
+            user.position_name = "백엔드(BE)"
+            user.save(update_fields=['position', 'position_name'])
+
+        #JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
-        response.data['access'] = str(refresh.access_token)
+        response.data['access'] =str(refresh.access_token)
         response.data['refresh'] = str(refresh)
-        response.data['user'] = UserDetailSerializer(user).data
+
+        #사용자 정보 포함
+        user_data = UserDetailSerializer(user).data
+        response.data['user'] = user_data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
+
+        # 디버깅 정보 출력
+        print(f"[DEBUG] Kakao login response user data: {user_data}")
+
         return response
 
 
@@ -55,11 +82,39 @@ class NaverLoginView(SocialLoginView):
     def get_response(self):
         response = super().get_response()
         user = self.user
+
+        # 사용자 정보 확인 밒 업데이트 (필요시)
+        if not user.provider or user.provider != 'naver':
+            user.provider = 'naver'
+            user.save(update_fields=['provider'])
+            print(f"[DEBUG] Updated Naver user provider: {user.provider}")
+
+        # 사용자 정보 확인을 위해 다시 DB에서 조회
+        user = user.__class__.objects.get(pk=user.pk)
+
+        #필수 정보가 없는 경우 설정
+        if not user.nickname or user.nickname == "":
+            user.nickname = f"Naver_{user.id}"
+            user.save(update_fields=['nickname'])
+
+        if not user.position_name:
+            user.position = 1
+            user.position_name = "백엔드(BE)"
+            user.save(update_fields=['position', 'position_name'])
+
+        #JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
-        response.data['access'] = str(refresh.access_token)
+        response.data['access'] =str(refresh.access_token)
         response.data['refresh'] = str(refresh)
-        response.data['user'] = UserDetailSerializer(user).data
+
+        #사용자 정보 포함
+        user_data = UserDetailSerializer(user).data
+        response.data['user'] = user_data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
+
+        # 디버깅 정보 출력
+        print(f"[DEBUG] Naver login response user data: {user_data}")
+
         return response
 
 
@@ -77,9 +132,33 @@ class GithubLoginView(SocialLoginView):
     def get_response(self):
         response = super().get_response()
         user = self.user
+
+        # GitHub 사용자 정보 확인 및 업데이트 (필요시)
+        if not user.provider or user.provider != 'github':
+            user.provider = 'github'
+            user.save(update_fields=['provider'])
+
+        # 사용자 정보 확인을 위해 다시 DB에서 조회
+        user = user.__class__.objects.get(pk=user.pk)
+
+        # 필수 정보가 없는 경우 설정
+        if not user.nickname or user.nickname == "":
+            user.nickname = f"GitHub_{user.id}"
+            user.save(update_fields=['nickname'])
+
+        if not user.position_name:
+            user.position = 1
+            user.position_name = "백엔드(BE)"
+            user.save(update_fields=['position', 'position_name'])
+
+        # JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
         response.data['access'] = str(refresh.access_token)
         response.data['refresh'] = str(refresh)
-        response.data['user'] = UserDetailSerializer(user).data
+
+        # 사용자 정보 포함
+        user_data = UserDetailSerializer(user).data
+        response.data['user'] = user_data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
+
         return response

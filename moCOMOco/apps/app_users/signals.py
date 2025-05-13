@@ -5,13 +5,11 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 @receiver(post_save, sender=User)
-def set_default_position(_sender, instance, created, **_kwargs):
-    """
-    새 사용자가 생성될 때 기본 포지션 설정
-    - 포지션 값이 없는 경우에만 기본값 설정
-    """
-    if created and not instance.position_name:
-        instance.position = 1  # 기본값: 백엔드(BE)
-        instance.position_name = "백엔드(BE)"
-        # update_fields를 사용하여 다른 필드는 업데이트하지 않음
-        instance.save(update_fields=['position', 'position_name'])
+def log_user_save(sender, instance, created, **kwargs):
+    """사용자 생성 또는 업데이트 시 로그 남기기"""
+    if created:
+        print(f"[DEBUG] 새 사용자 생성: {instance.email}, Provider: {instance.provider}, "
+              f"Nickname: {instance.nickname}, Name: {instance.name}")
+    else:
+        print(f"[DEBUG] 사용자 업데이트: {instance.email}, Provider: {instance.provider}, "
+              f"Nickname: {instance.nickname}, Name: {instance.name}")
