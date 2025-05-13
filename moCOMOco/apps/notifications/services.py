@@ -1,5 +1,5 @@
-from apps import Notification
-from apps import ChatRoomParticipant
+from apps.notifications.models import Notification
+from apps.chat.models import ChatRoomParticipant
 from django.utils import timezone
 
 class NotificationService:

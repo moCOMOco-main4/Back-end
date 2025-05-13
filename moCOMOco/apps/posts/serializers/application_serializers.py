@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps import Application
+from apps.posts.models.application import Application
 
 # 모집 신청 생성용
 class ApplicationCreateSerializer(serializers.ModelSerializer):

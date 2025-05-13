@@ -3,10 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions , generics
 from .models import ChatRoomParticipant, ChatMessage
-from apps import Post
+from apps.posts.models import Post
 from .serializers import ChatRoomSerializer , ChatMessageSerializer , ChatMessageCreateSerializer
 from rest_framework.exceptions import PermissionDenied
-from apps import NotificationService
+from apps.notifications.services import NotificationService
 
 class ChatRoomListView(APIView):
     permission_classes = [permissions.IsAuthenticated]

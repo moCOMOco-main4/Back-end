@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps import Schedule
+from apps.posts.models.schedule import Schedule
 
 # 일정 등록
 class ScheduleCreateSerializer(serializers.ModelSerializer):
