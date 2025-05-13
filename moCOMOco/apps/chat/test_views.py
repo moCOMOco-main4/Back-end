@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
-from apps.chat.models import ChatRoomParticipant, ChatMessage
+from apps import ChatRoomParticipant, ChatMessage
 
 class ChatRoomListAPITest(TestCase):
     def setUp(self):

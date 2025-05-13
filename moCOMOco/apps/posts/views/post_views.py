@@ -2,15 +2,21 @@ from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser
 
+# models
 from apps.posts.models.post import Post
+
+# serializers
 from apps.posts.serializers.post_serializers import (
     PostListSerializer,
     PostDetailSerializer,
     PostUpdateSerializer,
     PostCreateSerializer,
 )
-from drf_spectacular.utils import extend_schema  # Swagger 문서 연결용
 
+from drf_spectacular.utils import extend_schema
+
+
+# 모집글 생성
 class PostCreateView(generics.CreateAPIView):
     serializer_class = PostCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -24,10 +30,9 @@ class PostCreateView(generics.CreateAPIView):
 @extend_schema(responses=PostListSerializer)
 class PostListView(generics.ListAPIView):
     serializer_class = PostListSerializer
-    queryset = Post.objects.all()
 
     def get_queryset(self):
-        qs = self.queryset
+        qs = Post.objects.all()
         category = self.request.query_params.get('category')
         is_closed = self.request.query_params.get('is_closed')
 
@@ -35,6 +40,7 @@ class PostListView(generics.ListAPIView):
             qs = qs.filter(category=category)
         if is_closed is not None:
             qs = qs.filter(is_closed=(is_closed.lower() == 'true'))
+
         return qs
 
 

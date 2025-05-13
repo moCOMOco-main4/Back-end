@@ -2,22 +2,21 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.views import APIView
-from django.http import Http404
 
-from apps.posts.models import Post, Application
+# 공통 믹스인
+from apps.posts.utils.mixins import PostAccessMixin
+
+# models
+from apps.posts.models.application import Application
+
+# serializers
 from apps.posts.serializers.application_serializers import (
     ApplicationCreateSerializer,
     MyApplicationSerializer,
 )
-from apps.notifications.services import NotificationService
 
-# 모집글 조회 헬퍼
-class PostAccessMixin:
-    def get_post(self):
-        try:
-            return Post.objects.get(id=self.kwargs['post_id'])
-        except Post.DoesNotExist:
-            raise Http404("모집글을 찾을 수 없습니다.")
+# services
+from apps.notifications.services import NotificationService
 
 
 # 참여 신청
@@ -27,35 +26,30 @@ class ApplicationCreateView(PostAccessMixin, generics.CreateAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['post'] = self.get_post()
+        context['post'] = self.get_post(self.kwargs['post_id'])
         return context
 
     def perform_create(self, serializer):
         user = self.request.user
-        post = self.get_post()
+        post = self.get_post(self.kwargs['post_id'])
         role = self.request.data.get('role')
-        application = serializer.save(user=user, post=post, role=role)
-        NotificationService.send_apply_created(application)
 
-        # 모집 마감 여부
         if post.is_closed:
             raise ValidationError("모집이 마감된 글입니다.")
 
-        # 역할 유효성 확인
         if role not in post.roles:
             raise ValidationError(f"{role} 역할은 이 모집글에 존재하지 않습니다.")
 
-        # 역할별 정원 초과 확인
         max_count = post.roles[role]
         current_count = Application.objects.filter(post=post, role=role).count()
         if current_count >= max_count:
             raise ValidationError(f"{role} 역할은 이미 마감되었습니다.")
 
-        # 중복 신청 확인
         if Application.objects.filter(user=user, post=post).exists():
             raise ValidationError("이미 신청한 모집글입니다.")
 
-        serializer.save(user=user, post=post, role=role)
+        application = serializer.save(user=user, post=post, role=role)
+        NotificationService.send_apply_created(application)
 
 
 # 참여 취소
@@ -63,7 +57,7 @@ class ApplicationCancelView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, post_id):
-        post = self.get_post()
+        post = self.get_post(post_id)
         application = Application.objects.filter(user=request.user, post=post).first()
 
         if not application:

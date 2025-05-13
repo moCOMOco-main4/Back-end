@@ -2,19 +2,16 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from django.http import Http404
 
+# Mixin
+from apps.posts.utils.mixins import PostAccessMixin
+
+# models
 from apps.posts.models.post import Post
 from apps.posts.models.post_like import PostLike
-from apps.posts.serializers.post_serializers import PostListSerializer
 
-# 모집글 조회 헬퍼
-class PostAccessMixin:
-    def get_post(self, post_id):
-        try:
-            return Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            raise Http404("모집글을 찾을 수 없습니다.")
+# serializers
+from apps.posts.serializers.post_serializers import PostListSerializer
 
 
 # 즐겨찾기 추가

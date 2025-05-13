@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from apps.chat.models import ChatRoomParticipant
-from apps.notifications.services import NotificationService
+from apps import ChatRoomParticipant
+from apps import NotificationService
 
 @receiver(post_save, sender=ChatRoomParticipant)
 def on_chat_participant_join(sender, instance, created, **kwargs):
