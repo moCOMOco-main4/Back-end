@@ -1,71 +1,121 @@
 from rest_framework import serializers
-from apps.posts.models import Post, Application
-from apps.posts.serializers.application_serializers import ApplicationSimpleSerializer
+from apps.posts.models.post import Post
+from apps.posts.models.application import Application
+from apps.posts.models.post_like import PostLike
+from apps.app_users.models import User
 
-
-# 모집글 생성 시리얼라이저
+# 모집글 등록용
 class PostCreateSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False)
+
     class Meta:
         model = Post
         fields = [
-            'title', 'content', 'category',
-            'place_name', 'address', 'latitude', 'longitude',
-            'roles', 'date', 'image'
+            'title', 'content', 'category', 'date', 'place_name', 'address',
+            'latitude', 'longitude', 'max_people', 'roles', 'image'
         ]
 
+    def validate_roles(self, value):
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("roles 필드는 JSON 형식이어야 합니다.")
+        for role, count in value.items():
+            if not isinstance(role, str) or not isinstance(count, int):
+                raise serializers.ValidationError("roles는 {역할: 인원수} 형식이어야 합니다.")
+        return value
 
-# 모집글 리스트용 (홈 화면)
+
+# 모집글 목록 조회용
 class PostListSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-    image = serializers.ImageField(read_only=True)
-
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'category', 'place_name', 'is_closed', 'username', 'image']
-
-
-# 모집글 상세 조회용
-class PostDetailSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-    applications = ApplicationSimpleSerializer(many=True, read_only=True)
-    remaining_roles = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    img_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'content', 'category',
-            'place_name', 'address', 'latitude', 'longitude',
-            'roles', 'remaining_roles',
-            'date', 'is_closed', 'created_at', 'updated_at',
-            'image', 'username',  # user 필드 제거
-            'applications'
+            'id', 'title', 'category', 'is_closed', 'date',
+            'place_name', 'latitude', 'longitude', 'max_people',
+            'is_liked', 'img_url'
         ]
 
-    def get_remaining_roles(self, obj):
-        """
-        roles 필드 기반으로 각 역할에 남은 인원 계산
-        예: {'backend': 1, 'frontend': 0}
-        """
-        result = {}
-        for role, max_count in obj.roles.items():
-            current = Application.objects.filter(post=obj, role=role).count()
-            result[role] = max(0, max_count - current)
-        return result
+    def get_is_liked(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            return PostLike.objects.filter(post=obj, user=user).exists()
+        return False
+
+    def get_img_url(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return request.build_absolute_uri('/media/posts/images/default.png')
 
 
-# 모집글 수정용
+# 작성자 정보
+class WriterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'nickname', 'profile_image']
+
+
+# 참여자 정보
+class ParticipantSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='user.id')
+    nickname = serializers.CharField(source='user.nickname')
+    profile_image = serializers.ImageField(source='user.profile_image')
+
+    class Meta:
+        model = Application
+        fields = ['id', 'nickname', 'profile_image']
+
+
+# 모집글 상세 조회
+class PostDetailSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source='user', read_only=True)
+    participants = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    is_applied = serializers.SerializerMethodField()
+    img_url = serializers.SerializerMethodField()
+    current_people = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = [
+            'id', 'title', 'content', 'category', 'date',
+            'place_name', 'address', 'latitude', 'longitude',
+            'is_closed', 'max_people', 'created_at', 'updated_at',
+            'writer', 'participants', 'is_liked', 'is_applied',
+            'img_url', 'current_people'
+        ]
+
+    def get_participants(self, obj):
+        applications = Application.objects.filter(post=obj)
+        return ParticipantSerializer(applications, many=True).data
+
+    def get_is_liked(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return PostLike.objects.filter(post=obj, user=user).exists()
+        return False
+
+    def get_is_applied(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return Application.objects.filter(post=obj, user=user).exists()
+        return False
+
+    def get_img_url(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return request.build_absolute_uri('/media/posts/images/default.png')
+
+    def get_current_people(self, obj):
+        return Application.objects.filter(post=obj).count()
+
+
+# 모집글 수정
 class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = [
-            'title', 'content', 'category',
-            'place_name', 'address', 'latitude', 'longitude',
-            'roles', 'date', 'image', 'is_closed'
-        ]
-
-
-# 지도 전용
-class PostLocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'place_name', 'latitude', 'longitude']
+        fields = ['title', 'content', 'category', 'date', 'place_name', 'address', 'latitude', 'longitude', 'max_people']
+        extra_kwargs = {field: {'required': False} for field in fields}

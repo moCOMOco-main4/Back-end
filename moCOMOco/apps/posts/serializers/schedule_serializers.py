@@ -1,22 +1,28 @@
 from rest_framework import serializers
-from apps.posts.models import Schedule
-# 일정 생성
+from apps.posts.models.schedule import Schedule
+
+# 일정 등록
 class ScheduleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = ['post', 'date', 'memo']
-#일정 리스트 조회
-class ScheduleListSerializer(serializers.ModelSerializer):
-    post_id = serializers.IntegerField(source='post.id', read_only=True)
-    post_title = serializers.CharField(source='post.title', read_only=True)
-    type = serializers.SerializerMethodField()
+        fields = ['date', 'memo', 'created_at']
+        read_only_fields = ['created_at']
 
+
+# 일정 수정
+class ScheduleUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = ['post_id', 'post_title', 'date', 'memo', 'type']
+        fields = ['date', 'memo']
+        read_only_fields = []
+        extra_kwargs = {
+            'date': {'required': False},
+            'memo': {'required': False},
+        }
 
-    def get_type(self, obj):
-        user = self.context['request'].user
-        if obj.post.user == user:
-            return 'created'
-        return 'participated'
+
+# 일정 목록 조회
+class ScheduleListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schedule
+        fields = ['id','date', 'memo']
