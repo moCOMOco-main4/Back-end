@@ -5,12 +5,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, parser_classes
+
+from .models import User
 from .serializers import (
     UserDetailSerializer, UserUpdateSerializer, PositionSerializer,
 )
 from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+from django.shortcuts import get_object_or_404
+from .serializers import UserProfileSerializer
 
 
 # Position 매핑
@@ -168,3 +172,13 @@ class PositionView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(APIView):
+    """다른 사용자의 프로필 정보를 조회하는 API View"""
+    permission_classes = [IsAuthenticated] # 로그인한 사용자만 접근 가능
+
+    def git(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)

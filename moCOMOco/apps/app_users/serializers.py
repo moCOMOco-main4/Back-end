@@ -36,3 +36,11 @@ class CustomJWTSerializer(JWTSerializer):
 
     class Meta:
         fields = ('access', 'refresh', 'user', 'isNewUser')
+
+# 다른 사용자의 프로필을 볼수있는 정보
+class UserProfileSerializer(serializers.ModelSerializer):
+    """다른 사용자에게 공개되는 프로필 정보 시리얼라이저"""
+    class Meta:
+        model = User
+        fields = ['id', 'nickname', 'name', 'github_url', 'portfolio_url',
+                  'intro', 'position', 'position_name', 'profile_image']
