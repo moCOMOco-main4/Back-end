@@ -3,8 +3,8 @@ from django.conf import settings
 
 # 모집글 카테고리 선택지 (드롭다운 형태)
 CATEGORY_CHOICES = [
-    ('meeting', '모집'),        # 일반 모임
-    ('project', '프로젝트'),     # 사이드 프로젝트
+    ('meeting', '모집'),       
+    ('project', '프로젝트'),     
 ]
 
 
