@@ -1,6 +1,5 @@
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema
 from django.db.models import Q
 
