@@ -5,7 +5,7 @@ from apps.posts.models.application import Application
 from apps.chat.models import ChatRoomParticipant
 from apps.notifications.services import NotificationService
 
-
+# 모집 정원 다 찼을 때 자동 마감
 @receiver(post_save, sender=Application)
 def auto_close_post_if_full(sender, instance, created, **kwargs):
     if not created:
