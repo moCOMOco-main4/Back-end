@@ -1,7 +1,8 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from apps.posts.models.application import Application
-
+from apps.chat.models import ChatRoomParticipant
+from apps.notifications.services import NotificationService
 
 # 모집 정원 다 찼을 때 자동 마감
 @receiver(post_save, sender=Application)
@@ -33,3 +34,15 @@ def auto_reopen_post_if_not_full(sender, instance, **kwargs):
     if total_current < total_max and post.is_closed:
         post.is_closed = False
         post.save()
+
+@receiver(post_save, sender=Application)
+def on_application_accepted(sender, instance: Application, created, **kwargs):
+    if created:
+        return
+    if instance.status == 'accepted':
+        NotificationService.send_apply_accepted(instance)
+        ChatRoomParticipant.objects.get_or_create(
+            user=instance.user,
+            room_id=str(instance.post.id),
+            defaults={'alarm_on': True}
+        )
