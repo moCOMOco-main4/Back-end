@@ -1,0 +1,1889 @@
+openapi: 3.0.3
+info:
+  title: Django Mini Project API
+  version: 1.0.0
+  description: API documentation for Django Mini Project
+paths:
+  /api/auth/login/:
+    post:
+      operationId: api_auth_login_create
+      description: |-
+        Check the credentials and return the REST Token
+        if the credentials are valid and authenticated.
+        Calls Django Auth login method to register User ID
+        in Django session framework
+
+        Accept the following POST parameters: username, password
+        Return the REST Framework Token Object's key.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWT'
+          description: ''
+  /api/auth/login/github/:
+    post:
+      operationId: api_auth_login_github_create
+      description: |-
+        GitHub 소셜 로그인 뷰
+        - 프론트엔드에서 받은 인증 코드로 사용자 인증 처리
+        - JWT 토큰 발급
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /api/auth/login/kakao/:
+    post:
+      operationId: api_auth_login_kakao_create
+      description: |-
+        카카오 소셜 로그인 뷰
+        - 프론트엔드에서 받은 인증 코드로 사용자 인증 처리
+        - JWT 토큰 발급
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /api/auth/login/naver/:
+    post:
+      operationId: api_auth_login_naver_create
+      description: |-
+        네이버 소셜 로그인 뷰
+        - 프론트엔드에서 받은 인증 코드로 사용자 인증 처리
+        - JWT 토큰 발급
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+  /api/auth/login/url/{provider}/:
+    get:
+      operationId: api_auth_login_url_retrieve
+      description: 소셜 로그인 URL 생성
+      parameters:
+      - in: path
+        name: provider
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/logout/:
+    post:
+      operationId: api_auth_logout_create
+      description: |-
+        Calls Django logout method and delete the Token object
+        assigned to the current User object.
+
+        Accepts/Returns nothing.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/auth/password/change/:
+    post:
+      operationId: api_auth_password_change_create
+      description: |-
+        Calls Django Auth SetPasswordForm save method.
+
+        Accepts the following POST parameters: new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/auth/password/reset/:
+    post:
+      operationId: api_auth_password_reset_create
+      description: |-
+        Calls Django Auth PasswordResetForm save method.
+
+        Accepts the following POST parameters: email
+        Returns the success/fail message.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/auth/password/reset/confirm/:
+    post:
+      operationId: api_auth_password_reset_confirm_create
+      description: |-
+        Password reset e-mail link is confirmed, therefore
+        this resets the user's password.
+
+        Accepts the following POST parameters: token, uid,
+            new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/auth/registration/:
+    post:
+      operationId: api_auth_registration_create
+      description: |-
+        Registers a new user.
+
+        Accepts the following POST parameters: username, email, password1, password2.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWT'
+          description: ''
+  /api/auth/registration/resend-email/:
+    post:
+      operationId: api_auth_registration_resend_email_create
+      description: |-
+        Resends another email to an unverified email.
+
+        Accepts the following POST parameter: email.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendEmailVerification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResendEmailVerification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResendEmailVerification'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/auth/registration/verify-email/:
+    post:
+      operationId: api_auth_registration_verify_email_create
+      description: |-
+        Verifies the email associated with the provided key.
+
+        Accepts the following POST parameter: key.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /api/auth/token/refresh/:
+    post:
+      operationId: api_auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/auth/token/verify/:
+    post:
+      operationId: api_auth_token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /api/auth/user/:
+    get:
+      operationId: api_auth_user_retrieve
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+    put:
+      operationId: api_auth_user_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+    patch:
+      operationId: api_auth_user_partial_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetail'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+  /api/auth/users/me/:
+    get:
+      operationId: api_auth_users_me_retrieve
+      description: 현재 사용자 정보 조회 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_auth_users_me_partial_update
+      description: 현재 사용자 정보 조회 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_auth_users_me_destroy
+      description: 현재 사용자 정보 조회 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/users/me/delete/:
+    get:
+      operationId: api_auth_users_me_delete_retrieve
+      description: 현재 사용자 정보 조회 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_auth_users_me_delete_partial_update
+      description: 현재 사용자 정보 조회 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_auth_users_me_delete_destroy
+      description: 현재 사용자 정보 조회 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/users/me/upload-image/:
+    post:
+      operationId: api_auth_users_me_upload_image_create
+      description: 프로필 이미지 업로드 전용 엔드포인트
+      parameters:
+      - in: form
+        name: profile_image_file
+        schema:
+          type: string
+          format: binary
+        description: 업로드할 프로필 이미지
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profile_image_file:
+                  type: string
+                  format: binary
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/users/position/:
+    post:
+      operationId: api_auth_users_position_create
+      description: 사용자 포지션 관리 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_auth_users_position_partial_update
+      description: 사용자 포지션 관리 API 뷰
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/posts/:
+    get:
+      operationId: api_v1_posts_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostList'
+          description: ''
+  /api/v1/posts/{id}/:
+    get:
+      operationId: api_v1_posts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDetail'
+          description: ''
+  /api/v1/posts/{id}/detailed/:
+    get:
+      operationId: api_v1_posts_detailed_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostSimpleDetail'
+          description: ''
+  /api/v1/posts/{id}/like/:
+    post:
+      operationId: api_v1_posts_like_create
+      description: 모집글을 즐겨찾기에 추가합니다. 중복 추가는 허용되지 않습니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          description: No response body
+  /api/v1/posts/{post_id}/apply/:
+    post:
+      operationId: api_v1_posts_apply_create
+      description: 모집글에 역할 기반으로 참여 신청합니다.
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyApplication'
+          description: ''
+  /api/v1/posts/{post_id}/cancel/:
+    delete:
+      operationId: api_v1_posts_cancel_destroy
+      description: 참여했던 모집글에서 신청을 취소합니다.
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/posts/{post_id}/schedule/:
+    post:
+      operationId: api_v1_posts_schedule_create
+      description: 모집글에 일정 정보를 등록합니다. 작성자만 등록할 수 있습니다.
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleList'
+          description: ''
+  /api/v1/posts/{post_id}/schedule/{id}/:
+    put:
+      operationId: api_v1_posts_schedule_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScheduleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScheduleUpdate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleUpdate'
+          description: ''
+    patch:
+      operationId: api_v1_posts_schedule_partial_update
+      description: 기존 등록된 일정을 수정합니다. 작성자만 수정 가능합니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedScheduleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedScheduleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedScheduleUpdate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleList'
+          description: ''
+  /api/v1/posts/{post_id}/schedule/{id}/delete/:
+    delete:
+      operationId: api_v1_posts_schedule_delete_destroy
+      description: 등록된 일정을 삭제합니다. 작성자만 삭제 가능합니다.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/posts/{post_id}/schedule/list/:
+    get:
+      operationId: api_v1_posts_schedule_list_list
+      description: 특정 모집글에 등록된 전체 일정 목록을 조회합니다. (post_id를 쿼리 파라미터로 전달)
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleList'
+          description: ''
+  /api/v1/posts/applied/:
+    get:
+      operationId: api_v1_posts_applied_list
+      description: 내가 신청한 모집글 목록을 조회합니다.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MyApplication'
+          description: ''
+  /api/v1/posts/create/:
+    post:
+      operationId: api_v1_posts_create_create
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          description: No response body
+  /api/v1/posts/joined/:
+    get:
+      operationId: api_v1_posts_joined_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostList'
+          description: ''
+  /api/v1/posts/liked/:
+    get:
+      operationId: api_v1_posts_liked_list
+      description: 내가 즐겨찾기한 모든 모집글을 목록으로 조회합니다.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostList'
+          description: ''
+  /api/v1/posts/my/:
+    get:
+      operationId: api_v1_posts_my_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostList'
+          description: ''
+  /chat/{room_id}/messages/:
+    get:
+      operationId: chat_messages_list
+      parameters:
+      - in: path
+        name: room_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - chat
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessage'
+          description: ''
+  /chat/{room_id}/messages/{message_id}/:
+    delete:
+      operationId: chat_messages_destroy
+      parameters:
+      - in: path
+        name: message_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: room_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - chat
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /chat/{room_id}/messages/send/:
+    post:
+      operationId: chat_messages_send_create
+      parameters:
+      - in: path
+        name: room_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChatMessageCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChatMessageCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageCreate'
+          description: ''
+  /chat/rooms/:
+    get:
+      operationId: chat_rooms_retrieve
+      tags:
+      - chat
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+  /notifications/:
+    get:
+      operationId: notifications_list
+      tags:
+      - notifications
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+          description: ''
+  /notifications/{notification_id}/read/:
+    patch:
+      operationId: notifications_read_partial_update
+      parameters:
+      - in: path
+        name: notification_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - notifications
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    ApplicationCreate:
+      type: object
+      properties:
+        role:
+          type: string
+      required:
+      - role
+    CategoryEnum:
+      enum:
+      - project
+      - study
+      type: string
+      description: |-
+        * `project` - 프로젝트
+        * `study` - 스터디
+    ChatMessage:
+      type: object
+      properties:
+        ChatMessage_id:
+          type: integer
+          readOnly: true
+        chat_user_id:
+          type: integer
+          readOnly: true
+        nickname:
+          type: string
+          readOnly: true
+        profile_image:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - ChatMessage_id
+      - chat_user_id
+      - created_at
+      - nickname
+      - profile_image
+    ChatMessageCreate:
+      type: object
+      properties:
+        ChatMessage_id:
+          type: integer
+          readOnly: true
+        room_id:
+          type: string
+          readOnly: true
+        chat_user_id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - ChatMessage_id
+      - chat_user_id
+      - content
+      - created_at
+      - room_id
+    JWT:
+      type: object
+      description: Serializer for JWT authentication.
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserDetail'
+      required:
+      - access
+      - refresh
+      - user
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - password
+    MyApplication:
+      type: object
+      properties:
+        post_id:
+          type: integer
+        title:
+          type: string
+        category:
+          type: string
+        date:
+          type: string
+          format: date-time
+        place_name:
+          type: string
+        role:
+          type: string
+        is_closed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - date
+      - is_closed
+      - place_name
+      - post_id
+      - role
+      - title
+    Notification:
+      type: object
+      properties:
+        Notification_id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+          maxLength: 230
+        content:
+          type: string
+          maxLength: 255
+        is_read:
+          type: boolean
+        url:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - Notification_id
+      - content
+      - created_at
+      - is_read
+      - type
+    Participant:
+      type: object
+      properties:
+        id:
+          type: integer
+        nickname:
+          type: string
+        profile_image:
+          type: string
+          format: uri
+      required:
+      - id
+      - nickname
+      - profile_image
+    PasswordChange:
+      type: object
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+      required:
+      - new_password1
+      - new_password2
+    PasswordReset:
+      type: object
+      description: Serializer for requesting a password reset e-mail.
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetConfirm:
+      type: object
+      description: Serializer for confirming a password reset attempt.
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - new_password1
+      - new_password2
+      - token
+      - uid
+    PatchedScheduleUpdate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        memo:
+          type: string
+    PatchedUserDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        nickname:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          nullable: true
+          maxLength: 100
+        phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        github_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        portfolio_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        intro:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        position_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        provider:
+          type: string
+          readOnly: true
+          nullable: true
+        profile_image:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+    PostCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        date:
+          type: string
+          format: date-time
+        place_name:
+          type: string
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 255
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        max_people:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        roles: {}
+        image:
+          type: string
+          format: uri
+      required:
+      - address
+      - category
+      - content
+      - date
+      - latitude
+      - longitude
+      - max_people
+      - place_name
+      - title
+    PostDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        date:
+          type: string
+          format: date-time
+        place_name:
+          type: string
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 255
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        is_closed:
+          type: boolean
+        max_people:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        writer:
+          allOf:
+          - $ref: '#/components/schemas/Writer'
+          readOnly: true
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Participant'
+          readOnly: true
+        is_liked:
+          type: boolean
+          readOnly: true
+        is_applied:
+          type: boolean
+          readOnly: true
+        img_url:
+          type: string
+          format: uri
+          readOnly: true
+        current_people:
+          type: integer
+          readOnly: true
+        role_status:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+      required:
+      - address
+      - category
+      - content
+      - created_at
+      - current_people
+      - date
+      - id
+      - img_url
+      - is_applied
+      - is_liked
+      - latitude
+      - longitude
+      - max_people
+      - participants
+      - place_name
+      - role_status
+      - title
+      - updated_at
+      - writer
+    PostList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 100
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        is_closed:
+          type: boolean
+        date:
+          type: string
+          format: date-time
+        place_name:
+          type: string
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 255
+        max_people:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        status:
+          type: string
+          readOnly: true
+        role_status:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+        is_writer:
+          type: boolean
+          readOnly: true
+        is_applied:
+          type: boolean
+          readOnly: true
+        is_liked:
+          type: boolean
+          readOnly: true
+        img_url:
+          type: string
+          format: uri
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - address
+      - category
+      - created_at
+      - date
+      - id
+      - img_url
+      - is_applied
+      - is_liked
+      - is_writer
+      - max_people
+      - place_name
+      - role_status
+      - status
+      - title
+      - updated_at
+    PostSimpleDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 100
+        content:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        date:
+          type: string
+          format: date-time
+        place_name:
+          type: string
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 255
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        is_closed:
+          type: boolean
+        max_people:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        writer:
+          allOf:
+          - $ref: '#/components/schemas/Writer'
+          readOnly: true
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Participant'
+          readOnly: true
+        is_liked:
+          type: boolean
+          readOnly: true
+        is_applied:
+          type: boolean
+          readOnly: true
+        img_url:
+          type: string
+          format: uri
+          readOnly: true
+        current_people:
+          type: integer
+          readOnly: true
+        role_status:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+      required:
+      - address
+      - category
+      - content
+      - created_at
+      - current_people
+      - date
+      - id
+      - img_url
+      - is_applied
+      - is_liked
+      - latitude
+      - longitude
+      - max_people
+      - participants
+      - place_name
+      - role_status
+      - title
+      - updated_at
+      - writer
+    Register:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 0
+          minLength: 1
+        email:
+          type: string
+          format: email
+        password1:
+          type: string
+          writeOnly: true
+        password2:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password1
+      - password2
+    ResendEmailVerification:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    RestAuthDetail:
+      type: object
+      properties:
+        detail:
+          type: string
+          readOnly: true
+      required:
+      - detail
+    ScheduleCreate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        memo:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - date
+    ScheduleList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date-time
+        memo:
+          type: string
+      required:
+      - date
+      - id
+    ScheduleUpdate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        memo:
+          type: string
+    SocialLogin:
+      type: object
+      properties:
+        access_token:
+          type: string
+        code:
+          type: string
+        id_token:
+          type: string
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    UserDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        nickname:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          nullable: true
+          maxLength: 100
+        phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        github_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        portfolio_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        intro:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        position_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        provider:
+          type: string
+          readOnly: true
+          nullable: true
+        profile_image:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+      required:
+      - email
+      - id
+      - nickname
+      - provider
+    VerifyEmail:
+      type: object
+      properties:
+        key:
+          type: string
+          writeOnly: true
+      required:
+      - key
+    Writer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nickname:
+          type: string
+          maxLength: 20
+        profile_image:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+      required:
+      - id
+      - nickname
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

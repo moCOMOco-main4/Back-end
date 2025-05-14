@@ -2,24 +2,23 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
 
-# 공통 믹스인
 from apps.posts.utils.mixins import PostAccessMixin
-
-# models
 from apps.posts.models.application import Application
-
-# serializers
 from apps.posts.serializers.application_serializers import (
     ApplicationCreateSerializer,
     MyApplicationSerializer,
 )
-
-# services
 from apps.notifications.services import NotificationService
 
 
-# 참여 신청
+# 모집글 참여 신청
+@extend_schema(
+    request=ApplicationCreateSerializer,
+    responses=MyApplicationSerializer,
+    description="모집글에 역할 기반으로 참여 신청합니다."
+)
 class ApplicationCreateView(PostAccessMixin, generics.CreateAPIView):
     serializer_class = ApplicationCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -52,10 +51,14 @@ class ApplicationCreateView(PostAccessMixin, generics.CreateAPIView):
         NotificationService.send_apply_created(application)
 
 
-# 참여 취소
+# 모집글 참여 취소
 class ApplicationCancelView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        responses={204: None},
+        description="참여했던 모집글에서 신청을 취소합니다."
+    )
     def delete(self, request, post_id):
         post = self.get_post(post_id)
         application = Application.objects.filter(user=request.user, post=post).first()
@@ -71,6 +74,10 @@ class ApplicationCancelView(PostAccessMixin, APIView):
 
 
 # 내가 신청한 모집글 목록 조회
+@extend_schema(
+    responses=MyApplicationSerializer,
+    description="내가 신청한 모집글 목록을 조회합니다."
+)
 class MyApplicationListView(generics.ListAPIView):
     serializer_class = MyApplicationSerializer
     permission_classes = [permissions.IsAuthenticated]

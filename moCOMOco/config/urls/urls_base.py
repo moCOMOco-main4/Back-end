@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/auth/', include('apps.app_users.urls_apps')),
 
     # posts
-    path('api/v1/posts/', include('apps.posts.urls.post_urls')),
+    path('posts/', include('apps.posts.urls.post_urls')),
 
     # Swagger UI URL 패턴
     path(
