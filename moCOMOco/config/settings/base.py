@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist', #블랙리스트 토큰 추가
     'drf_spectacular',
     'dj_rest_auth',
     'dj_rest_auth.registration',
