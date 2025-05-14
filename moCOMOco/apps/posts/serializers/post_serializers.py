@@ -48,7 +48,7 @@ class PostListSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField())
     def get_status(self, obj):
-        return str(Application.objects.filter(post=obj).count())
+        return Application.objects.filter(post=obj).count()
 
     @extend_schema_field(serializers.DictField(child=serializers.CharField()))
     def get_role_status(self, obj):
@@ -225,5 +225,10 @@ class PostSimpleDetailSerializer(serializers.ModelSerializer):
 class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'category', 'date', 'place_name', 'address', 'latitude', 'longitude', 'max_people']
-        extra_kwargs = {field: {'required': False} for field in fields}
+        fields = [
+            'title', 'content', 'category',
+            'date', 'place_name', 'address',
+            'latitude', 'longitude', 'max_people',
+        ]
+
+

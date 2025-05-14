@@ -20,7 +20,7 @@ from apps.posts.views.schedule_views import (
 urlpatterns = [
     # 모집글 목록, 생성
     path('', PostListView.as_view(), name='post-list'),  # GET /posts/
-    path('create/', PostCreateView.as_view(), name='post-create'),  # POST /posts/create/
+    path('', PostCreateView.as_view(), name='post-create'),  # POST /posts/
 
     # 단건 조회(GET), 수정(PATCH), 삭제(DELETE) - RESTful 방식으로 통일
     path('<int:pk>/', PostDetailView.as_view(), name='post-detail'),  # GET /posts/{id}/
