@@ -1,11 +1,5 @@
 from django.urls import path
 
-# views
-from apps.posts.views.post_views import (
-    PostListView, PostDetailView, MyPostListView,
-    PostUpdateView, PostDeleteView, PostCreateView,
-    ParticipatedPostListView, PostDetailedRatioView,
-)
 from apps.posts.views.application_views import (
     ApplicationCreateView, ApplicationCancelView, MyApplicationListView,
 )
@@ -16,6 +10,13 @@ PostLikeDeleteView,
 from apps.posts.views.schedule_views import (
     ScheduleCreateView, ScheduleUpdateView,
     ScheduleDeleteView, ScheduleListView,
+)
+from apps.posts.views.post_views import (
+    PostListCreateView,
+    MyPostListView,
+    ParticipatedPostListView,
+    PostDetailUpdateDeleteView,
+    PostDetailedRatioView,
 )
 
 urlpatterns = [

@@ -279,14 +279,6 @@ class PostSimpleDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-<<<<<<< Updated upstream
-            'title', 'content', 'category',
-            'date', 'place_name', 'address',
-            'latitude', 'longitude', 'max_people',
-        ]
-
-
-=======
             'id', 'title', 'content', 'category', 'date',
             'place_name', 'address', 'latitude', 'longitude',
             'is_closed', 'max_people', 'created_at', 'updated_at',
@@ -298,4 +290,3 @@ class PostSimpleDetailSerializer(serializers.ModelSerializer):
         if obj.image:
             return request.build_absolute_uri(obj.image.url)
         return request.build_absolute_uri('/media/posts/images/default.png')
->>>>>>> Stashed changes
