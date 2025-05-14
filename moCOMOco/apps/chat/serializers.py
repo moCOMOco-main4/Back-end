@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import ChatMessage
+from apps.posts.models import Post
+from django.contrib.auth import get_user_model
 
 class ChatRoomSerializer(serializers.Serializer):
     room_id = serializers.CharField()
@@ -9,6 +11,41 @@ class ChatRoomSerializer(serializers.Serializer):
     latest_time = serializers.DateTimeField(allow_null=True)
     unread_count = serializers.IntegerField()
     participants = serializers.ListField(child=serializers.CharField())
+    title = serializers.SerializerMethodField()
+
+    def get_title(self, obj):
+        room_id = obj['room_id']
+        User = get_user_model()
+        if room_id.isdigit():
+            try:
+                post = Post.objects.get(id=int(room_id))
+                return post.title
+            except Post.DoesNotExist:
+                return ''
+        elif '_' in room_id:
+            a, b = room_id.split('_', 1)
+        else:
+            return ''
+
+        me = str(self.context['request'].user.id)
+        other_id = b if a == me else a
+        try:
+            other = User.objects.get(id=other_id)
+            return getattr(other, 'nickname', other.get_username())
+        except User.DoesNotExist:
+            return ''
+
+    class Meta:
+        fields = [
+            'room_id',
+            'title',
+            'post_id',
+            'post_title',
+            'latest_message',
+            'latest_time',
+            'unread_count',
+            'participants',
+        ]
 
 class ChatMessageSerializer(serializers.ModelSerializer):
     # nickname 필드와 프로필 이미지 URL
