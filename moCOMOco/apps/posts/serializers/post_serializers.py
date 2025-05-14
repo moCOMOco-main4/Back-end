@@ -7,8 +7,9 @@ from apps.posts.models.post_like import PostLike
 from apps.app_users.models import User
 
 
-# 모집글 생성용
+# 모집글 생성 시 사용되는 Serializer
 class PostCreateSerializer(serializers.ModelSerializer):
+    # 역할군별 인원 수 (프론트에서 개별 입력)
     image = serializers.ImageField(required=False)
     backend = serializers.IntegerField(required=False, default=0)
     frontend = serializers.IntegerField(required=False, default=0)
@@ -33,7 +34,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
         return post
 
 
-# 모집글 목록 조회용 (상우님 기준)
+# 모집글 목록 조회용 (간략 목록용)
 class PostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
@@ -43,21 +44,31 @@ class PostListSerializer(serializers.ModelSerializer):
         ]
 
 
-# 모집글 상세 조회용 (상우님 기준)
+# 모집글 상세 조회용 (전체 정보 포함)
 class PostDetailSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    is_liked = serializers.SerializerMethodField()
-    current_people = serializers.SerializerMethodField()
+    writer = serializers.SerializerMethodField()         # 작성자 정보
+    is_liked = serializers.SerializerMethodField()       # 좋아요 여부
+    is_applied = serializers.SerializerMethodField()     # 신청 여부
+    current_people = serializers.SerializerMethodField() # 현재 총 신청 인원
+    participants = serializers.SerializerMethodField()   # 참여자 리스트
+    role_status = serializers.SerializerMethodField()    # 역할군별 인원
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = [
+            'id', 'title', 'content', 'category',
+            'place_name', 'address', 'latitude', 'longitude',
+            'image', 'date', 'max_people', 'is_closed',
+            'created_at', 'updated_at',
+            'writer', 'is_liked', 'is_applied',
+            'current_people', 'participants', 'role_status'
+        ]
 
-    def get_user(self, obj):
+    def get_writer(self, obj):
+        # 작성자 정보: id, 닉네임, 프로필 이미지
         return {
             "id": obj.user.id,
             "nickname": obj.user.nickname,
-            "email": obj.user.email,
             "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
         }
 
@@ -65,28 +76,76 @@ class PostDetailSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         return PostLike.objects.filter(user=user, post=obj).exists()
 
+    def get_is_applied(self, obj):
+        user = self.context['request'].user
+        return Application.objects.filter(user=user, post=obj).exists()
+
     def get_current_people(self, obj):
         return Application.objects.filter(post=obj).count()
 
+    def get_participants(self, obj):
+        # 참여자 요약 정보 리스트 (id, 닉네임, 프로필)
+        return [
+            {
+                "id": app.user.id,
+                "nickname": app.user.nickname,
+                "profile_image": app.user.profile_image.url if app.user.profile_image else None
+            }
+            for app in Application.objects.filter(post=obj).select_related('user')
+        ]
 
-# 모집글 수정용 (상우님 기준)
+    def get_role_status(self, obj):
+        # JSONField 형태로 저장된 역할별 인원수 반환
+        return obj.roles
+
+
+# 모집글 수정용
 class PostUpdateSerializer(serializers.ModelSerializer):
+    # 수정 시에도 역할별 인원 받기
+    backend = serializers.IntegerField(required=False, default=0)
+    frontend = serializers.IntegerField(required=False, default=0)
+    designer = serializers.IntegerField(required=False, default=0)
+
     class Meta:
         model = Post
         fields = [
             'title', 'content', 'category',
             'place_name', 'address', 'latitude', 'longitude',
-            'image', 'date', 'max_people', 'is_closed'
+            'image', 'date', 'max_people', 'is_closed',
+            'backend', 'frontend', 'designer'
         ]
 
+    def update(self, instance, validated_data):
+        roles = {
+            "backend": validated_data.pop("backend", 0),
+            "frontend": validated_data.pop("frontend", 0),
+            "designer": validated_data.pop("designer", 0),
+        }
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.roles = roles
+        instance.save()
+        return instance
 
-# 비율형 상세 조회용 (선형님 기준)
+
+
+# 참여비율 기반 간단 상세 조회 (선형님 기준)
 class PostSimpleDetailSerializer(serializers.ModelSerializer):
-    current_people = serializers.SerializerMethodField()
+    current_people = serializers.SerializerMethodField()  # 현재 신청자 수
+    status = serializers.SerializerMethodField()          # UI용 상태: 모집중 / 모집완료
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'category', 'max_people', 'current_people']
+        fields = [
+            'id', 'title', 'category',
+            'place_name', 'image',
+            'max_people', 'current_people',
+            'is_closed', 'status',
+        ]
 
     def get_current_people(self, obj):
         return Application.objects.filter(post=obj).count()
+
+    def get_status(self, obj):
+        current = self.get_current_people(obj)
+        return "모집완료" if current >= obj.max_people else "모집중"
