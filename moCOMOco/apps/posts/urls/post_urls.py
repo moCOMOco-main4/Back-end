@@ -11,6 +11,7 @@ from apps.posts.views.application_views import (
 )
 from apps.posts.views.like_views import (
     PostLikeCreateView, MyLikedPostListView,
+PostLikeDeleteView,
 )
 from apps.posts.views.schedule_views import (
     ScheduleCreateView, ScheduleUpdateView,
