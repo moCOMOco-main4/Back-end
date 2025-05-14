@@ -2,6 +2,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.utils import timezone
 from .models import ChatMessage, ChatRoomParticipant
+from apps.notifications.services import NotificationService
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -36,12 +37,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         timestamp = timezone.now().isoformat()
 
-        # DB에 메시지 저장
+        # 1) DB에 메시지 저장
         chat_msg = await database_sync_to_async(ChatMessage.objects.create)(
             room_id=self.room_id,
             chat_user=user,
             content=message_text
         )
+        # 2) 알림 생성 (WS 메시지에도 NotificationService 호출)
+        await database_sync_to_async(
+            NotificationService.send_chat_message_notification
+        )(chat_msg)
 
         # 그룹 전체에 브로드캐스트
         await self.channel_layer.group_send(
