@@ -7,7 +7,7 @@ from apps.posts.models.post_like import PostLike
 from apps.app_users.models import User
 
 
-# 모집글 생성 시 사용되는 Serializer
+# 모집글 생성용
 class PostCreateSerializer(serializers.ModelSerializer):
     # 역할군별 인원 수 (프론트에서 개별 입력)
     image = serializers.ImageField(required=False)
