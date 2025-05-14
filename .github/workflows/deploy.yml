@@ -25,7 +25,7 @@ jobs:
           source ~/.bashrc
           source $(poetry env info --path)/bin/activate
           poetry install
-          cd ~/moCOMOco
+          cd ~/Back-end/moCOMOco
           python manage.py migrate
           python manage.py collectstatic --noinput
           sudo systemctl restart gunicorn
