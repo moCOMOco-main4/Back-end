@@ -3,27 +3,83 @@ from rest_framework import serializers
 from apps.posts.models.post import Post
 from apps.posts.models.application import Application
 from apps.posts.models.post_like import PostLike
-from apps.app_users.models import User  # 사용자 모델이 app_users 앱에 있다면 이렇게
+from apps.app_users.models import User
 
 
-# 모집글 등록용
+# 모집글 생성용
 class PostCreateSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
+
+    backend = serializers.IntegerField(
+        required=False,
+        default=0,
+        help_text="백엔드 모집 인원 수",
+        example=2
+    )
+    frontend = serializers.IntegerField(
+        required=False,
+        default=0,
+        help_text="프론트엔드 모집 인원 수",
+        example=1
+    )
+    designer = serializers.IntegerField(
+        required=False,
+        default=0,
+        help_text="디자이너 모집 인원 수",
+        example=1
+    )
 
     class Meta:
         model = Post
         fields = [
-            'title', 'content', 'category', 'date', 'place_name', 'address',
-            'latitude', 'longitude', 'max_people', 'roles', 'image'
+            'id', 'title', 'content', 'category',
+            'place_name', 'address', 'latitude', 'longitude',
+            'image', 'date', 'max_people', 'is_closed',
+            'backend', 'frontend', 'designer'
         ]
 
-    def validate_roles(self, value):
-        if not isinstance(value, dict):
-            raise serializers.ValidationError("roles 필드는 JSON 형식이어야 합니다.")
-        for role, count in value.items():
-            if not isinstance(role, str) or not isinstance(count, int):
-                raise serializers.ValidationError("roles는 {역할: 인원수} 형식이어야 합니다.")
-        return value
+    def create(self, validated_data):
+        roles = {
+            "backend": validated_data.pop("backend", 0),
+            "frontend": validated_data.pop("frontend", 0),
+            "designer": validated_data.pop("designer", 0),
+        }
+        validated_data['roles'] = roles
+        return Post.objects.create(**validated_data)
+
+# 모집글 수정용
+class PostUpdateSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False)
+
+    # 프론트에서 역할군 개별 입력
+    backend = serializers.IntegerField(required=False, default=0)
+    frontend = serializers.IntegerField(required=False, default=0)
+    designer = serializers.IntegerField(required=False, default=0)
+
+    class Meta:
+        model = Post
+        fields = [
+            'title', 'content', 'category',
+            'place_name', 'address', 'latitude', 'longitude',
+            'image', 'date', 'max_people', 'is_closed',
+            'backend', 'frontend', 'designer'
+        ]
+
+    def update(self, instance, validated_data):
+        # 역할 필드 분리해서 dict로 조합
+        roles = {
+            "backend": validated_data.pop("backend", instance.roles.get("backend", 0)),
+            "frontend": validated_data.pop("frontend", instance.roles.get("frontend", 0)),
+            "designer": validated_data.pop("designer", instance.roles.get("designer", 0)),
+        }
+        validated_data["roles"] = roles
+
+        # 나머지 필드 업데이트
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 # 모집글 목록 조회용
