@@ -46,12 +46,12 @@ class PostListSerializer(serializers.ModelSerializer):
 
 # 모집글 상세 조회용 (전체 정보 포함)
 class PostDetailSerializer(serializers.ModelSerializer):
-    writer = serializers.SerializerMethodField()         # 작성자 정보
-    is_liked = serializers.SerializerMethodField()       # 좋아요 여부
-    is_applied = serializers.SerializerMethodField()     # 신청 여부
-    current_people = serializers.SerializerMethodField() # 현재 총 신청 인원
-    participants = serializers.SerializerMethodField()   # 참여자 리스트
-    role_status = serializers.SerializerMethodField()    # 역할군별 인원
+    writer = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    is_applied = serializers.SerializerMethodField()
+    current_people = serializers.SerializerMethodField()
+    participants = serializers.SerializerMethodField()
+    role_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
