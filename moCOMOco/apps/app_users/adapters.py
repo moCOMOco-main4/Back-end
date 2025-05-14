@@ -47,35 +47,34 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             kakao_account = social_data.get('kakao_account', {})
             profile = kakao_account.get('profile', {})
 
-            user.nickname = profile.get('nickname', user.nickname or f'Kakao_{user.id}')
+            user.nickname = profile.get('nickname', user.nickname)
             user.profile_image = profile.get('profile_image_url', user.profile_image)
             user.name = profile.get('nickname', user.name)
 
         elif provider == 'naver':
-            response = social_data.get('response', {})
+            # response 키가 있으면 사용, 없으면 social_data 자체를 사용
+            if 'response' in social_data:
+                response = social_data.get('response', {})
+            else:
+                response = social_data
 
-            user.nickname = response.get('nickname', user.nickname or f'Naver_{user.id}')
+            user.nickname = response.get('nickname', user.nickname)
             user.profile_image = response.get('profile_image', user.profile_image)
             user.name = response.get('name', user.name)
 
         elif provider == 'github':
-            user.nickname = social_data.get('login', user.nickname or f'GitHub_{user.id}')
+            user.nickname = social_data.get('login', user.nickname)
             user.profile_image = social_data.get('avatar_url', user.profile_image)
             user.name = social_data.get('name', user.name)
 
         # 신규 사용자 플래그 설정
         setattr(user, '_is_new_user', is_new_user)
 
-        # 포지션이 설정되지 않은 경우 기본값 설정
-        if not user.position:
-            user.position = 1
-            user.position_name = "백엔드(BE)"
-
         #모든 필드가 제대로 설정되었는지 확인
         print(f"[DEBUG] Final user data before save: provider = {user.provider},"
               f"nickname = {user.nickname}, name = {user.name}, position = {user.position}")
 
         # 변경된 필드 명시적으로 저장
-        user.save(update_fields=['provider', 'nickname', 'name', 'profile_image', 'position', 'position_name'])
+        user.save(update_fields=['provider', 'nickname', 'name', 'profile_image'])
 
         return user

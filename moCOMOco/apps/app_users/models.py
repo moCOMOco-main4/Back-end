@@ -61,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     intro = models.TextField(null=True, blank=True) # 사용자 설명란
 
     # 포지션 정보(API 문서에 따른 포지션 타입)
-    position = models.IntegerField(default=1) # 1:BE , 2:FE
+    position = models.IntegerField(default=True, blank=True) # 기본값 없음(사용자가 선택할수 있게 기본값이없음)
     position_name = models.CharField(max_length=100, null=True, blank=True)
 
     # Django 모델 필수 필드

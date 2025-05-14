@@ -42,16 +42,6 @@ class KakaoLoginView(SocialLoginView):
         # 사용자 정보 확인을 위해 다시 DB에서 조회
         user = user.__class__.objects.get(pk=user.pk)
 
-        #필수 정보가 없는 경우 설정
-        if not user.nickname or  user.nickname == "":
-            user.nickname = f"Kakao_{user.id}"
-            user.save(update_fields=['nickname'])
-
-        if not user.position_name:
-            user.position = 1
-            user.position_name = "백엔드(BE)"
-            user.save(update_fields=['position', 'position_name'])
-
         #JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
         response.data['access'] =str(refresh.access_token)
@@ -92,16 +82,6 @@ class NaverLoginView(SocialLoginView):
         # 사용자 정보 확인을 위해 다시 DB에서 조회
         user = user.__class__.objects.get(pk=user.pk)
 
-        #필수 정보가 없는 경우 설정
-        if not user.nickname or user.nickname == "":
-            user.nickname = f"Naver_{user.id}"
-            user.save(update_fields=['nickname'])
-
-        if not user.position_name:
-            user.position = 1
-            user.position_name = "백엔드(BE)"
-            user.save(update_fields=['position', 'position_name'])
-
         #JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
         response.data['access'] =str(refresh.access_token)
@@ -140,16 +120,6 @@ class GithubLoginView(SocialLoginView):
 
         # 사용자 정보 확인을 위해 다시 DB에서 조회
         user = user.__class__.objects.get(pk=user.pk)
-
-        # 필수 정보가 없는 경우 설정
-        if not user.nickname or user.nickname == "":
-            user.nickname = f"GitHub_{user.id}"
-            user.save(update_fields=['nickname'])
-
-        if not user.position_name:
-            user.position = 1
-            user.position_name = "백엔드(BE)"
-            user.save(update_fields=['position', 'position_name'])
 
         # JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
