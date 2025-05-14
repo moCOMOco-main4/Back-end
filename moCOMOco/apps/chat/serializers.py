@@ -51,6 +51,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     # nickname 필드와 프로필 이미지 URL
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    content = serializers.CharField()
 
     class Meta:
         model = ChatMessage
@@ -59,6 +60,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
             'chat_user_id',
             'nickname',
             'profile_image',
+            'content',
             'created_at',
         ]
     # noinspection PyMethodMayBeStatic

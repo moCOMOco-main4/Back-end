@@ -193,8 +193,8 @@ class OneToOneChatRoomCreateView(GenericAPIView):
             'room_id': room_id,
             'post_id': post_id,
             'post_title': post_title,
-            'latest_message': '',
-            'latest_time': None,
+            'latest_message': join_msg.content,
+            'latest_time': join_msg.created_at,
             'unread_count': 0,
             'participants': nicknames_list,
         }
