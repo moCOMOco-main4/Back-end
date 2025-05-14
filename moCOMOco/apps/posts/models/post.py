@@ -14,7 +14,7 @@ class Post(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='posts',  # user.posts로 접근 가능
+        related_name='posts',
     )
 
     # 제목 / 본문
@@ -25,10 +25,10 @@ class Post(models.Model):
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=15)
 
     # 장소 정보
-    place_name = models.CharField(max_length=100)        # 장소명
-    address = models.TextField(max_length=100)           # 주소
-    latitude = models.FloatField()                       # 위도
-    longitude = models.FloatField()                      # 경도
+    place_name = models.CharField(max_length=100)
+    address = models.TextField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
     # 썸네일 이미지 (선택 사항)
     image = models.ImageField(
