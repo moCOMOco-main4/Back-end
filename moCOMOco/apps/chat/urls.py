@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import ChatRoomListView, ChatMessageListView ,ChatMessageCreateView , ChatMessageDestroyView
 from .views import OneToOneChatRoomCreateView
+
 urlpatterns =[
     path('<str:room_id>/messages/', ChatMessageListView.as_view(), name='chat-message-list'),
     path('rooms/', ChatRoomListView.as_view(), name='chat-room-list'),
