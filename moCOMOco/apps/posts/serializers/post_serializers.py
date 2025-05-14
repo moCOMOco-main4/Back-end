@@ -15,19 +15,16 @@ class PostCreateSerializer(serializers.ModelSerializer):
         required=False,
         default=0,
         help_text="백엔드 모집 인원 수",
-        example=2
     )
     frontend = serializers.IntegerField(
         required=False,
         default=0,
         help_text="프론트엔드 모집 인원 수",
-        example=1
     )
     designer = serializers.IntegerField(
         required=False,
         default=0,
         help_text="디자이너 모집 인원 수",
-        example=1
     )
 
     class Meta:
@@ -48,11 +45,10 @@ class PostCreateSerializer(serializers.ModelSerializer):
         validated_data['roles'] = roles
         return Post.objects.create(**validated_data)
 
+
 # 모집글 수정용
 class PostUpdateSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
-
-    # 프론트에서 역할군 개별 입력
     backend = serializers.IntegerField(required=False, default=0)
     frontend = serializers.IntegerField(required=False, default=0)
     designer = serializers.IntegerField(required=False, default=0)
@@ -67,7 +63,6 @@ class PostUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        # 역할 필드 분리해서 dict로 조합
         roles = {
             "backend": validated_data.pop("backend", instance.roles.get("backend", 0)),
             "frontend": validated_data.pop("frontend", instance.roles.get("frontend", 0)),
@@ -75,7 +70,6 @@ class PostUpdateSerializer(serializers.ModelSerializer):
         }
         validated_data["roles"] = roles
 
-        # 나머지 필드 업데이트
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
@@ -277,14 +271,31 @@ class PostSimpleDetailSerializer(serializers.ModelSerializer):
         return result
 
 
-# 모집글 수정
-class PostUpdateSerializer(serializers.ModelSerializer):
+# 비율형 모집글 상세 조회용 (선형님 전용)
+class PostSimpleDetailSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source='user', read_only=True)
+    img_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Post
         fields = [
+<<<<<<< Updated upstream
             'title', 'content', 'category',
             'date', 'place_name', 'address',
             'latitude', 'longitude', 'max_people',
         ]
 
 
+=======
+            'id', 'title', 'content', 'category', 'date',
+            'place_name', 'address', 'latitude', 'longitude',
+            'is_closed', 'max_people', 'created_at', 'updated_at',
+            'writer', 'img_url', 'roles'
+        ]
+
+    def get_img_url(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return request.build_absolute_uri('/media/posts/images/default.png')
+>>>>>>> Stashed changes
