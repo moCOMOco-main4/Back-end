@@ -6,11 +6,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.posts.models.post import Post
 from apps.posts.serializers.post_serializers import (
-    PostListSerializer,         # 모집글 목록 조회용 (상우님 기준)
-    PostDetailSerializer,       # 모집글 상세 조회용 (상우님 기준)
-    PostUpdateSerializer,       # 모집글 수정용 (상우님 기준)
-    PostCreateSerializer,       # 모집글 생성용
-    PostSimpleDetailSerializer  # 참여 비율 기반 상세 조회용 (선형님 기준)
+    PostListSerializer,         # 상우님 기준 목록
+    PostDetailSerializer,       # 상우님 기준 상세
+    PostUpdateSerializer,       # 상우님 기준 수정
+    PostCreateSerializer,        # 생성용
+    PostSimpleDetailSerializer
 )
 
 
