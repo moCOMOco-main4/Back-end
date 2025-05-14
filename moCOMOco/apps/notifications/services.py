@@ -109,3 +109,26 @@ class NotificationService:
             is_read=False,
             created_at=timezone.now()
         )
+
+    @staticmethod
+    def create_notification(*, to, notification_type, link, chat_message=None, post=None, schedule=None, application=None, participant=None):
+        if notification_type == 'chat_join' and participant:
+            content = f"{participant.user.get_username()}님이 방에 참여했습니다." # 1:1 채팅 입장 알림
+        elif chat_message:
+            content = chat_message.content # 일반 채팅 메시지 알림
+        else:
+            content = "새로운 알림이 도착했습니다." # 그 외(예: post, schedule 등) 알림
+
+        return Notification.objects.create(
+            user=to,
+            chat_message=chat_message,
+            post=post,
+            schedule=schedule,
+            application=application,
+            participant=participant,
+            type=notification_type,
+            content=content,
+            url=link,
+            is_read=False,
+            created_at=timezone.now()
+        )

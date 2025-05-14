@@ -100,9 +100,10 @@ class ChatMessageCreateView(generics.CreateAPIView):
 
         if not ChatRoomParticipant.objects.filter(user=user, room_id=room_id).exists():
             raise PermissionDenied("해당 채팅방의 참여자가 아닙니다.")
-        serializer.save(room_id=room_id, chat_user=user)
-        message = serializer.save(room_id=room_id, chat_user=user) # 메시지를 저장하고 , 반환된 인스턴스를 변수에 받음
-        NotificationService.send_chat_message_notification(message) # 저장된 메시지 정보로 알림을 자동 생성
+        # 단 한 번만 sav() -> 반환된 인스턴스를 message에 담기
+        message = serializer.save(room_id=room_id, chat_user=user)
+
+        NotificationService.send_chat_message_notification(message)
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
