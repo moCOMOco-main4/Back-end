@@ -18,15 +18,15 @@ from apps.posts.views.schedule_views import (
 )
 
 urlpatterns = [
-    # 모집글 목록, 생성
-    path('', PostListView.as_view(), name='post-list'),  # GET /posts/
-    path('', PostCreateView.as_view(), name='post-create'),  # POST /posts/
+    # 모집글 목록 + 생성
+    path('', PostListCreateView.as_view(), name='post-list-create'),  # GET/POST /posts/
 
-    # 단건 조회(GET), 수정(PATCH), 삭제(DELETE) - RESTful 방식으로 통일
-    path('<int:pk>/', PostDetailView.as_view(), name='post-detail'),  # GET /posts/{id}/
-    path('<int:pk>/', PostUpdateView.as_view(), name='post-update'),  # PATCH /posts/{id}/
-    path('<int:pk>/', PostDeleteView.as_view(), name='post-delete'),  # DELETE /posts/{id}/
-    path('<int:pk>/detailed/', PostDetailedRatioView.as_view(), name='post-detailed-ratio'),  # GET 비율형 상세
+    # 단건 조회(GET) + 수정(PATCH/PUT) + 삭제(DELETE)
+    path('<int:pk>/', PostDetailUpdateDeleteView.as_view(), name='post-detail-update-delete'),
+
+    # 비율형 role_status 조회 (선형님용)
+    path('<int:pk>/detailed/', PostDetailedRatioView.as_view(), name='post-detailed-ratio'),
+
 
     # 내가 작성한, 참여한 모집글 목록
     path('my/', MyPostListView.as_view(), name='my-posts'),
@@ -38,13 +38,14 @@ urlpatterns = [
     path('applied/', MyApplicationListView.as_view(), name='applied-posts'),
 
     # 즐겨찾기
-    path('<int:pk>/like/', PostLikeCreateView.as_view(), name='post-like'),
+    path('<int:post_id>/like/', PostLikeCreateView.as_view(), name='post-like'),
+    path('<int:post_id>/unlike/', PostLikeDeleteView.as_view(), name='post-unlike'),
     path('liked/', MyLikedPostListView.as_view(), name='liked-posts'),
 
-    # 일정 (쿼리 파라미터 방식으로 정리)
+    # 일정
     path('schedules/', ScheduleCreateView.as_view(), name='schedule-create'),
-    path('schedules/<int:pk>/', ScheduleUpdateView.as_view(), name='schedule-update'),
-    path('schedules/<int:pk>/', ScheduleDeleteView.as_view(), name='schedule-delete'),
+    path('schedules/<int:pk>/update/', ScheduleUpdateView.as_view(), name='schedule-update'),
+    path('schedules/<int:pk>/delete/', ScheduleDeleteView.as_view(), name='schedule-delete'),
     path('schedules/list/', ScheduleListView.as_view(), name='schedule-list'),
 ]
 
