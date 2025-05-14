@@ -1,4 +1,5 @@
-from django.core.files.storage import FileSystemStorage
+from django.core.files.base import ContentFile
+from storages.backends.s3boto3 import S3Boto3Storage
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,7 +8,6 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from .serializers import (
     UserDetailSerializer, UserUpdateSerializer, PositionSerializer,
 )
-from django.conf import settings
 from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
@@ -15,11 +15,14 @@ from drf_spectacular.types import OpenApiTypes
 
 # Position 매핑
 POSITION_NAMES = {
-    1: "백엔드(BE)",
-    2: "프론트엔드(FE)",
-    3: "풀스택(FS)",
-    4: "DB관리자(DBA)"
+    1: "백엔드",
+    2: "프론트엔드",
+    3: "풀스택",
+    4: "디자이너"
 }
+
+# s3 스토리지 인스턴스 생성
+s3_storage = S3Boto3Storage()
 
 def _update_user_position(user, position):
     """사용자 포지션 업데이트 헬퍼 함수"""
@@ -47,18 +50,16 @@ class UserDetailView(APIView):
         serializer = UserDetailSerializer(request.user)
         return Response(serializer.data)
 
-
     def patch(self, request):
-        # self를 사용하므로 static 메서드로 변환하지 않음
         serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
-        # 이피지 파일 처리 기능 추가
+        # 이피지 파일 처리 기능 수정(S3Boto3 사용)
         if 'profile_image_file' in request.FILES:
             uploaded_file =  request.FILES['profile_image_file']
-            # 이미지 저장 경로 설정
-            fs = FileSystemStorage(location=settings.MEDIA_ROOT / 'profile_images')
-            filename = fs.save(f"user_{request.user.id}_{uploaded_file.name}", uploaded_file)
-            #URL 생성 및 저장
-            file_url = f"{settings.MEDIA_URL}profile_images/{filename}"
+            # 이미지 저장 경로 변경(S3Boto3 변경)
+            file_name = f"profile_images/user_{request.user.id}_{uploaded_file.name}"
+            s3_storage.save(file_name, ContentFile(uploaded_file.read()))
+            # S3 URL 생성
+            file_url = s3_storage.url(file_name)
             request.data['profile_image'] = file_url
 
         if serializer.is_valid():
@@ -66,8 +67,7 @@ class UserDetailView(APIView):
             return Response(UserDetailSerializer(request.user).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        # self를 사용하므로 static 메서드로 변환하지 않음
+    def delete(self, request): # self를 사용하므로 static 메서드로 변환하지 않음
         request.user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -112,22 +112,28 @@ def upload_profile_image(request):
             'error': '유효한 이미지 파일이 아닙니다.'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # 이미지 저장 경로 설정
-    fs = FileSystemStorage(location=settings.MEDIA_ROOT / 'profile_images')
-    filename = fs.save(f"user_{request.user.id}_{uploaded_file.name}", uploaded_file)
-    # URL 생성 및 저장
-    file_url = f"{settings.MEDIA_URL}profile_images/{filename}"
+    # S3Boto#Storage를 사용하여 S3에 파일 업로드
+    try:
+        file_name = f"profile_images/user_{request.user.id}_{uploaded_file.name}"
+        s3_storage.save(file_name, ContentFile(uploaded_file.read()))
+        file_url = s3_storage.url(file_name)   # S3 URL 생성
 
-    # 사용자 프로필 업데이트
-    user = request.user
-    user.profile_image = file_url
-    user.save(update_fields=['profile_image'])
+        #사용자 프로필 업데이트
+        user = request.user
+        user.profile_image = file_url
+        user.save(update_fields=['profile_image'])
 
-    return Response({
-        'profile_image': file_url,
-        'user': UserDetailSerializer(user).data,
-        'message': '프로필 이미지가 업로드되었습니다.'
-    }, status=status.HTTP_200_OK)
+        return Response({
+            'profile_image': file_url,
+            'user': UserDetailSerializer(user).data,
+            'message': '프로필 이미지가 성공적으로 S3에 업로드되었습니다.'
+
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({
+            'error': f'이미지 업로드 중 오류가 발생했습니다: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PositionView(APIView):
@@ -141,7 +147,6 @@ class PositionView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 중복 코드를 헬퍼 함수로 대체
             response_data = _prepare_position_response(
                 request.user,
                 serializer.validated_data['position']
@@ -151,13 +156,11 @@ class PositionView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request):
-        # self를 사용하므로 static 메서드로 변환하지 않음
         serializer = PositionSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 중복 코드를 헬퍼 함수로 대체
             response_data = _prepare_position_response(
                 request.user,
                 serializer.validated_data['position']
