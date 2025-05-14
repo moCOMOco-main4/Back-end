@@ -108,7 +108,7 @@ class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         return post
 
 
-# 참여 비율 기반 상세 조회
+# 비율형 상세 조회 (선형님 기준)
 @extend_schema(
     responses=PostSimpleDetailSerializer,
     description="총인원 기준 비율로 현재 참여자 수를 보여줍니다. (예: 3/5)"
