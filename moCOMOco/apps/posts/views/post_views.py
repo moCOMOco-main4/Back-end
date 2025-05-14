@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema
 from django.db.models import Q
 
@@ -16,7 +17,7 @@ from apps.posts.serializers.post_serializers import (
 )
 
 
-# 목록 + 생성
+# 목록 + 생성 (List + Create API 통합)
 @extend_schema(
     request=PostCreateSerializer,
     responses={
@@ -59,7 +60,7 @@ class PostListCreateView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 
-# 내가 쓴 모임글 목록 조회
+# 내가 쓴 모집글 목록 조회
 @extend_schema(
     responses=PostListSerializer,
     description="현재 로그인한 사용자가 작성한 모임글 목록을 반환합니다."
@@ -72,7 +73,7 @@ class MyPostListView(generics.ListAPIView):
         return Post.objects.filter(user=self.request.user).order_by('-created_at')
 
 
-# 참여한 모임글 목록 조회
+# 참여한 모집글 목록 조회
 @extend_schema(
     responses=PostListSerializer,
     description="현재 로그인한 사용자가 작성하거나 신청한 모임글 목록을 반환합니다. 중복 없이 정렬됩니다."
@@ -93,7 +94,7 @@ class ParticipatedPostListView(generics.ListAPIView):
         return context
 
 
-# 상세조회 + 수정 + 삭제 통합 (상우님 버전 기준)
+# 상세 조회 + 수정 + 삭제 통합 (상우님 기준)
 @extend_schema(
     request=PostUpdateSerializer,
     responses={
@@ -139,7 +140,6 @@ class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         post = super().get_object()
-        # 수정 또는 삭제일 경우 작성자 권한 체크
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             if post.user != self.request.user:
                 raise PermissionDenied("작성자만 수정/삭제할 수 있습니다.")

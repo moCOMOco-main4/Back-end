@@ -2,11 +2,9 @@ from django.urls import path
 
 # views
 from apps.posts.views.post_views import (
-    PostListCreateView,
-    PostDetailUpdateDeleteView,
-    MyPostListView,
-    ParticipatedPostListView,
-    PostDetailedRatioView,
+    PostListView, PostDetailView, MyPostListView,
+    PostUpdateView, PostDeleteView, PostCreateView,
+    ParticipatedPostListView, PostDetailedRatioView,
 )
 from apps.posts.views.application_views import (
     ApplicationCreateView, ApplicationCancelView, MyApplicationListView,
@@ -29,6 +27,7 @@ urlpatterns = [
     # 비율형 role_status 조회 (선형님용)
     path('<int:pk>/detailed/', PostDetailedRatioView.as_view(), name='post-detailed-ratio'),
 
+
     # 내가 작성한, 참여한 모집글 목록
     path('my/', MyPostListView.as_view(), name='my-posts'),
     path('joined/', ParticipatedPostListView.as_view(), name='joined-posts'),
@@ -39,7 +38,6 @@ urlpatterns = [
     path('applied/', MyApplicationListView.as_view(), name='applied-posts'),
 
     # 즐겨찾기
-
     path('<int:post_id>/like/', PostLikeCreateView.as_view(), name='post-like'),
     path('<int:post_id>/unlike/', PostLikeDeleteView.as_view(), name='post-unlike'),
     path('liked/', MyLikedPostListView.as_view(), name='liked-posts'),
@@ -50,3 +48,4 @@ urlpatterns = [
     path('schedules/<int:pk>/delete/', ScheduleDeleteView.as_view(), name='schedule-delete'),
     path('schedules/list/', ScheduleListView.as_view(), name='schedule-list'),
 ]
+

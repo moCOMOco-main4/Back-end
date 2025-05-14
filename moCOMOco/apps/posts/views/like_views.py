@@ -3,15 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema
+
 # Mixin
 from apps.posts.utils.mixins import PostAccessMixin
-
-# models
 from apps.posts.models.post import Post
 from apps.posts.models.post_like import PostLike
-
-# serializers
 from apps.posts.serializers.post_serializers import PostListSerializer
+from apps.posts.serializers.empty_serializers import EmptySerializer
 
 
 # 즐겨찾기 추가
@@ -24,9 +22,12 @@ from apps.posts.serializers.post_serializers import PostListSerializer
             "value": None
         }
     ]
+
+
 )
 class PostLikeCreateView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = EmptySerializer
 
     def post(self, request, post_id):
         post = self.get_post(post_id)
@@ -68,10 +69,11 @@ class PostLikeDeleteView(PostAccessMixin, APIView):
             return Response({"detail": "즐겨찾기하지 않은 글입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# 내가 즐겨찾기한 모집글 목록
+# 내가 즐겨찾기한 모집글 목록 조회
 @extend_schema(
     responses=PostListSerializer,
-    description="현재 로그인한 사용자가 즐겨찾기한 모집글 목록을 반환합니다."
+    description="내가 즐겨찾기한 모든 모집글을 목록으로 조회합니다."
+
 )
 class MyLikedPostListView(generics.ListAPIView):
     serializer_class = PostListSerializer

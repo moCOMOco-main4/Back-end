@@ -27,6 +27,8 @@ class Notification(models.Model):
     chat_message = models.ForeignKey(
         ChatMessage,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         db_column='ChatMessage_id'
     )
     participant = models.ForeignKey(
