@@ -158,7 +158,19 @@ class OneToOneChatRoomCreateView(GenericAPIView):
             )
             participants.append(p)
 
-        NotificationService.send_chat_join_notification(participants[1]) # 알림 : 상대방에게 "메시지 전송 준비" join 알림
+        # 1) 방 입장 메시지를 ChatMessage로 저장
+        join_msg = ChatMessage.objects.create(
+            room_id=room_id,
+            chat_user=me,
+            content=f"{me.email}님이 방에 참여했습니다."
+        )
+        # 2) NotificationService에 chat_message 인자로 넘겨서 알림 생성
+        NotificationService.create_notification(
+            to=participants[1].user,
+            notification_type='chat_join',
+            link=f"/chat/{room_id}/",
+            chat_message=join_msg
+        )
 
         try:
             post_pk = int(room_id)
