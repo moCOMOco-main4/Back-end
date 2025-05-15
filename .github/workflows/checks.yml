@@ -41,15 +41,6 @@ jobs:
       run: |
         poetry run python moCOMOco/manage.py makemigrations --check --dry-run
 
-    - name: 1️⃣ Run linter (flake8 with warnings only)
-      continue-on-error: true
-      run: |
-        echo "[flake8]" > .flake8
-        echo "max-line-length = 120" >> .flake8
-        echo "exclude = .git,__pycache__,*/migrations/*,*.pyc" >> .flake8
-        echo "extend-ignore = W503" >> .flake8
-        poetry run pip install flake8
-        poetry run flake8 . --config .flake8 || echo "⚠️ flake8 found some issues, but not failing CI."
 
     - name: 2️⃣ Run tests (pytest)
       run: |
