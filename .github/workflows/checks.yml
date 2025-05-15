@@ -15,16 +15,21 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.13.2'
 
     - name: Install Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      env:
+        POETRY_HOME: $HOME/.poetry
 
-    - name: Install dependencies
+    - name: Set up Poetry path
+      run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies with Poetry
       run: |
-        poetry install
+        poetry config virtualenvs.in-project true
+        poetry install --no-interaction --no-root
 
     - name: 🔥 Fail if dev setting is in manage.py
       run: |
@@ -34,21 +39,15 @@ jobs:
         fi
 
     - name: 1️⃣ Run linter (flake8)
-      run: |
-        poetry run pip install flake8
-        poetry run flake8 .
+      run: poetry run flake8 .
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
 
     - name: 2️⃣ Run tests (pytest)
-      run: |
-        poetry run pip install pytest
-        poetry run pytest --disable-warnings
+      run: poetry run pytest --disable-warnings --maxfail=1 --tb=short
 
     - name: 3️⃣ Type checking (mypy)
-      run: |
-        poetry run pip install mypy
-        poetry run mypy .
+      run: poetry run mypy .
 
     - name: 5️⃣ Security check (bandit)
-      run: |
-        poetry run pip install bandit
-        poetry run bandit -r .
+      run: poetry run bandit -r . -x tests
