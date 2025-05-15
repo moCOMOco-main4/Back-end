@@ -1,74 +1,46 @@
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions, filters, status
 from rest_framework.exceptions import PermissionDenied
-from drf_spectacular.utils import extend_schema
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.posts.models.post import Post
 from apps.posts.serializers.post_serializers import (
-    PostListSerializer,
     PostDetailSerializer,
     PostUpdateSerializer,
-    PostCreateSerializer,
+    PostCreateListSerializer,
     PostSimpleDetailSerializer
 )
 
 
 # 모집글 목록 조회 + 모집글 생성 (상우님 기준)
-@extend_schema(
-    request=PostCreateSerializer,
-    responses={"GET": PostListSerializer, "POST": None},
-)
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
+    serializer_class = PostCreateListSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
-    # 검색(제목, 내용), 카테고리 필터 적용
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['title', 'content']
     filterset_fields = ['category']
 
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return PostCreateSerializer
-        return PostListSerializer
-
-    def perform_create(self, serializer):
-        backend = serializer.validated_data.pop("backend", 0)
-        frontend = serializer.validated_data.pop("frontend", 0)
-        designer = serializer.validated_data.pop("designer", 0)
-        fullstack = serializer.validated_data.pop("fullstack", 0)
-
-        # Post 인스턴스 생성
-        post = Post.objects.create(
-            **serializer.validated_data,
-            roles={
-                'backend': backend,
-                'frontend': frontend,
-                'designer': designer,
-                'fullstack': fullstack,
-            },
-            user=self.request.user,
-        )
-
-        # 현재 참여 인원이 max_people 도달 시 자동 마감
-        if post.participants.count() >= post.max_people:
-            post.is_closed = True
-            post.save()
-
-        return post
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'user': request.user})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 # 내가 작성한 모집글만 조회
 @extend_schema(
-    responses=PostListSerializer,
+    responses=PostCreateListSerializer,
     description="현재 로그인한 사용자가 작성한 모집글 목록"
 )
 class MyPostListView(generics.ListAPIView):
-    serializer_class = PostListSerializer
+    serializer_class = PostCreateListSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -78,11 +50,11 @@ class MyPostListView(generics.ListAPIView):
 
 # 내가 작성했거나 참여한 모집글 조회
 @extend_schema(
-    responses=PostListSerializer,
+    responses=PostCreateListSerializer,
     description="내가 작성했거나 참여한 모집글 목록 (중복 제거)"
 )
 class ParticipatedPostListView(generics.ListAPIView):
-    serializer_class = PostListSerializer
+    serializer_class = PostCreateListSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -94,9 +66,20 @@ class ParticipatedPostListView(generics.ListAPIView):
 
 
 # 모집글 단건 조회 + 수정 + 삭제
-@extend_schema(
-    request=PostUpdateSerializer,
-    responses={"GET": PostDetailSerializer, "PATCH": PostDetailSerializer, "DELETE": None}
+@extend_schema_view(
+    get=extend_schema(
+        summary="모집글 상세 조회",
+        responses=PostDetailSerializer
+    ),
+    patch=extend_schema(
+        summary="모집글 수정",
+        request=PostUpdateSerializer,
+        responses=PostDetailSerializer
+    ),
+    delete=extend_schema(
+        summary="모집글 삭제",
+        responses=None
+    ),
 )
 class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()

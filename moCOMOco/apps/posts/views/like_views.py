@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema
 from apps.posts.utils.mixins import PostAccessMixin
 from apps.posts.models.post import Post
 from apps.posts.models.post_like import PostLike
-from apps.posts.serializers.post_serializers import PostListSerializer
+from apps.posts.serializers.post_serializers import PostCreateListSerializer
 from apps.posts.serializers.empty_serializers import EmptySerializer
 
 
@@ -46,9 +46,8 @@ class PostLikeDeleteView(PostAccessMixin, APIView):
 
 
 # 내가 즐겨찾기한 모집글 목록 조회
-@extend_schema(responses=PostListSerializer)
 class MyLikedPostListView(generics.ListAPIView):
-    serializer_class = PostListSerializer
+    serializer_class = PostCreateListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
