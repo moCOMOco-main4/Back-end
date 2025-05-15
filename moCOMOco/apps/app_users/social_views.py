@@ -138,6 +138,8 @@ class GithubLoginView(SocialLoginView):
 
 
 class UserLogoutView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         refresh_token = request.data.get('refresh_token')
         if not refresh_token:
