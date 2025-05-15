@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from .social_views import KakaoLoginView, NaverLoginView, GithubLoginView
+from .social_views import KakaoLoginView, NaverLoginView, GithubLoginView, UserLogoutView
 from .url_views import SocialLoginURLView
 from dj_rest_auth.jwt_auth import get_refresh_view
 from dj_rest_auth.views import LogoutView
@@ -22,7 +22,8 @@ urlpatterns = [
     # JWT 토큰 관련
     path('token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    # path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout/', UserLogoutView.as_view(), name='logout'),
 
     # 사용자 관리
     path('users/me/', views.UserDetailView.as_view(), name='user_detail'),
