@@ -153,7 +153,8 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'API 문서',
     'DESCRIPTION': '코모코모 프로젝트 API 명세',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_INCLUDE_SCHEMA': True,
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # ─── JWT 설정 ─────────────────────────────────────────────
