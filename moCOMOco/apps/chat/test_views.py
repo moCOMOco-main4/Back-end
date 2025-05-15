@@ -47,7 +47,7 @@ class ChatRoomListAPITest(TestCase):
 
         room = data[0]
         # room_id 및 latest_message 검증
-        self.assertEqual(room['room_id'], 1)
+        self.assertEqual(room['room_id'], '1')
         self.assertEqual(room['latest_message'], '두 번째 메시지')
         # participants에 사용자 username이 포함되어야 함
         self.assertIn('testuser@naver.com', room['participants'])
