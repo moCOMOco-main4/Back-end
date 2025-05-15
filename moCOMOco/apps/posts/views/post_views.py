@@ -3,13 +3,14 @@ from rest_framework.exceptions import PermissionDenied
 from drf_spectacular.utils import extend_schema
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from apps.posts.models.post import Post
 from apps.posts.serializers.post_serializers import (
-    PostListSerializer,         # 상우님 기준 목록
-    PostDetailSerializer,       # 상우님 기준 상세
-    PostUpdateSerializer,       # 상우님 기준 수정
-    PostCreateSerializer,        # 생성용
+    PostListSerializer,
+    PostDetailSerializer,
+    PostUpdateSerializer,
+    PostCreateSerializer,
     PostSimpleDetailSerializer
 )
 
@@ -22,6 +23,7 @@ from apps.posts.serializers.post_serializers import (
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     # 검색(제목, 내용), 카테고리 필터 적용
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
