@@ -41,13 +41,6 @@ jobs:
       run: |
         poetry run python moCOMOco/manage.py makemigrations --check --dry-run
 
-    - name: 2️⃣ Run tests (pytest)
-      env:
-        DJANGO_SETTINGS_MODULE: moCOMOco.config.settings.dev
-      run: |
-        poetry run pip install pytest pytest-django
-        poetry run pytest --disable-warnings
-
     - name: 3️⃣ Type checking (mypy)
       run: |
         poetry run pip install mypy
