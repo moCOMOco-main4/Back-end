@@ -8,13 +8,12 @@ from apps.app_users.models import User
 
 
 # 모집글 생성용
-class PostCreateSerializer(serializers.ModelSerializer):
-    # 역할군별 인원 수 (프론트에서 개별 입력)
-    image = serializers.ImageField(required=False)
-    backend = serializers.IntegerField(required=False, default=0)
-    frontend = serializers.IntegerField(required=False, default=0)
-    designer = serializers.IntegerField(required=False, default=0)
-    fullstack = serializers.IntegerField(required=False, default=0)
+class PostCreateListSerializer(serializers.ModelSerializer):
+    # 역할군 인원 수 (프론트에서 개별 입력)
+    backend = serializers.IntegerField(required=False, write_only=True, default=0)
+    frontend = serializers.IntegerField(required=False, write_only=True, default=0)
+    designer = serializers.IntegerField(required=False, write_only=True, default=0)
+    fullstack = serializers.IntegerField(required=False, write_only=True, default=0)
 
     class Meta:
         model = Post
@@ -32,20 +31,8 @@ class PostCreateSerializer(serializers.ModelSerializer):
             "designer": validated_data.pop("designer", 0),
             "fullstack": validated_data.pop("fullstack", 0),
         }
-
-
-        post = Post.objects.create(**validated_data, roles=roles)
+        post = Post.objects.create(**validated_data, roles=roles, user=self.context['user'])
         return post
-
-
-# 모집글 목록 조회용 (간략 목록용)
-class PostListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = [
-            'id', 'title', 'category', 'is_closed',
-            'date', 'place_name', 'latitude', 'longitude', 'max_people'
-        ]
 
 
 # 모집글 상세 조회용 (전체 정보 포함)

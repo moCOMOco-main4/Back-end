@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from drf_spectacular.utils import extend_schema
 from apps.posts.utils.mixins import PostAccessMixin
 from apps.posts.models.schedule import Schedule
 from apps.posts.serializers.schedule_serializers import (
@@ -13,6 +13,11 @@ from apps.notifications.services import NotificationService
 
 
 # 일정 등록
+@extend_schema(
+    summary="일정 등록",
+    request=ScheduleCreateSerializer,
+    responses={201: None}
+)
 class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
     serializer_class = ScheduleCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -27,6 +32,11 @@ class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
 
 
 # 일정 수정
+@extend_schema(
+    summary="일정 수정",
+    request=ScheduleUpdateSerializer,
+    responses={200: None}
+)
 class ScheduleUpdateView(generics.UpdateAPIView):
     serializer_class = ScheduleUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -40,6 +50,10 @@ class ScheduleUpdateView(generics.UpdateAPIView):
 
 
 # 일정 삭제
+@extend_schema(
+    summary="일정 삭제",
+    responses={204: None}
+)
 class ScheduleDeleteView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Schedule.objects.all()
@@ -52,6 +66,10 @@ class ScheduleDeleteView(generics.DestroyAPIView):
 
 
 # 일정 목록 조회
+@extend_schema(
+    summary="일정 목록 조회",
+    responses=ScheduleListSerializer
+)
 class ScheduleListView(generics.ListAPIView):
     serializer_class = ScheduleListSerializer
 

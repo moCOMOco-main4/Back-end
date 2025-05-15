@@ -38,7 +38,7 @@ class Post(models.Model):
     )
 
     # 모집 날짜 (모각코 예정일 등)
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=5)
 
     # 최대 인원 수 (전체 참가자 수 기준)
     max_people = models.PositiveIntegerField()

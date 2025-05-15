@@ -22,7 +22,7 @@ djangorestframework-simplejwt = "^5.5.0"
 dj-rest-auth = "7.0.0"
 django-allauth = "0.61.1"
 boto3 = "^1.38.14"
-django-storages = "^1.14.6"
+django-storages = {extras = ["boto3"], version = "^1.14.6"}
 channels = "^4.2.2"
 django-cors-headers = "^4.7.0"
 django-extensions = "^4.1"

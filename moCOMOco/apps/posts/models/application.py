@@ -38,6 +38,3 @@ class Application(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'post'], name='unique_user_post')
         ]
-
-    def __str__(self):
-        return f"{self.user} -> {self.post.title} ({self.role})"
