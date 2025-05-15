@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-.env 파일 로드 (manage.py 기준 상위 디렉토리 위치)
+# .env 파일 로드 (manage.py 기준 상위 디렉토리 위치)
 load_dotenv(Path(file).resolve().parent / ".env")
 
 def main():
