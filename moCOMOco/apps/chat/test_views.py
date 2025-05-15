@@ -10,7 +10,7 @@ class ChatRoomListAPITest(TestCase):
         User = get_user_model()
         # 1) 테스트용 유저 생성
         self.user = User.objects.create_user(
-            username='testuser', password='testpass'
+            username='testuser', password='testpass', email='testuser@naver.com'
         )
         # 2) 채팅방 참여자 레코드 생성
         ChatRoomParticipant.objects.create(
