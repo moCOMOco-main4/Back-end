@@ -10,7 +10,7 @@ class ChatRoomListAPITest(TestCase):
         User = get_user_model()
         # 1) 테스트용 유저 생성
         self.user = User.objects.create_user(
-            username='testuser', password='testpass', email='testuser@naver.com'
+            password='testpass', email='testuser@naver.com'
         )
         # 2) 채팅방 참여자 레코드 생성
         ChatRoomParticipant.objects.create(
@@ -50,4 +50,4 @@ class ChatRoomListAPITest(TestCase):
         self.assertEqual(room['room_id'], 'room_test_1')
         self.assertEqual(room['latest_message'], '두 번째 메시지')
         # participants에 사용자 username이 포함되어야 함
-        self.assertIn('testuser', room['participants'])
+        self.assertIn('testuser@naver.com', room['participants'])
