@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import TokenVerifyView
 
 urlpatterns = [
     # dj-rest-auth 경로
+    path('logout/', UserLogoutView.as_view(), name='logout'),
     path('', include('dj_rest_auth.urls')),
     path('registration/', include('dj_rest_auth.registration.urls')),
 
@@ -22,8 +23,6 @@ urlpatterns = [
     # JWT 토큰 관련
     path('token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    # path('logout/', LogoutView.as_view(), name='logout'),
-    path('logout/', UserLogoutView.as_view(), name='logout'),
 
     # 사용자 관리
     path('users/me/', views.UserDetailView.as_view(), name='user_detail'),
