@@ -5,7 +5,10 @@ from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken  # 추가된 부분
 from .serializers import UserDetailSerializer
 
@@ -130,5 +133,25 @@ class GithubLoginView(SocialLoginView):
         user_data = UserDetailSerializer(user).data
         response.data['user'] = user_data
         response.data['isNewUser'] = getattr(user, '_is_new_user', False)
+
+        return response
+
+
+class UserLogoutView(APIView):
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+        if not refresh_token:
+            return Response({"error": "Refresh token was not included in request body."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        response = Response({'detail': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+        if 'rest_framework_simplejwt.token_blacklist' not in settings.INSTALLED_APPS:
+            return response
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except TokenError as error:
+            return Response({'detail': error.args[0]}, status.HTTP_401_UNAUTHORIZED)
 
         return response
