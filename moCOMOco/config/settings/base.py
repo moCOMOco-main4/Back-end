@@ -193,8 +193,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-# ACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomAccountAdapter'
-# SOCIALACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'apps.app_users.adapters.CustomSocialAccountAdapter'
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
