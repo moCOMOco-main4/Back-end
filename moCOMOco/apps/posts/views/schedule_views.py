@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.posts.utils.mixins import PostAccessMixin
 from apps.posts.models.schedule import Schedule
@@ -15,6 +16,7 @@ from apps.notifications.services import NotificationService
 class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
     serializer_class = ScheduleCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def perform_create(self, serializer):
         post = self.get_post(self.kwargs['post_id'])
