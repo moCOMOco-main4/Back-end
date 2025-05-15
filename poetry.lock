@@ -1254,6 +1254,21 @@ jwt = ["pyjwt (>=2.9.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
 
 [[package]]
+name = "redis-cli"
+version = "1.0.1"
+description = "A Redis Python Client"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "redis-cli-1.0.1.tar.gz", hash = "sha256:6be46d8e6ae638fec27cb425d499b7f25b1592402c74d5d17f5b85b5e7f988a0"},
+    {file = "redis_cli-1.0.1-py3-none-any.whl", hash = "sha256:e9f6af4a8b7591d8bfd1e23be89bdd9666ce824df881748fb02b88dd30575dc8"},
+]
+
+[package.dependencies]
+redis = ">=4"
+
+[[package]]
 name = "referencing"
 version = "0.36.2"
 description = "JSON Referencing + Python"
@@ -1540,4 +1555,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "4df2d0d85405bb364fc4361ee7fbf5e059f9742f8794a176da3e2456f07d78c0"
+content-hash = "6560a3e364a0977d494bc1592fcd352cf2681e725b4c411ae441f34b6d9e7140"

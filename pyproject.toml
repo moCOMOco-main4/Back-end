@@ -31,6 +31,7 @@ pillow = "^11.2.1"
 gunicorn = "^23.0.0"
 django-filter = "^25.1"
 redis = "^6.1.0"
+redis-cli = "^1.0.1"
 
 [build-system]
 requires    = ["poetry-core>=2.0.0,<3.0.0"]
