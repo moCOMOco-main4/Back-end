@@ -17,13 +17,6 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: ➕ Add .flake8 config
-      run: |
-        echo "[flake8]" > .flake8
-        echo "max-line-length = 120" >> .flake8
-        echo "exclude = .git,__pycache__,*/migrations/*,*.pyc" >> .flake8
-        echo "extend-ignore = E501,W503" >> .flake8
-
     - name: Install Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
@@ -51,7 +44,7 @@ jobs:
     - name: 1️⃣ Run linter (flake8)
       run: |
         poetry run pip install flake8
-        poetry run flake8 . --config .flake8
+        poetry run flake8 .
 
     - name: 2️⃣ Run tests (pytest)
       run: |
