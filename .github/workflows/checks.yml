@@ -15,21 +15,20 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.13.2'
+        python-version: '3.11'
 
     - name: Install Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
-      env:
-        POETRY_HOME: $HOME/.poetry
+        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
 
-    - name: Set up Poetry path
-      run: echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies with Poetry
+    - name: Set Python version in pyproject.toml
       run: |
-        poetry config virtualenvs.in-project true
-        poetry install --no-interaction --no-root
+        poetry env use 3.11
+
+    - name: Install dependencies
+      run: |
+        poetry install
 
     - name: 🔥 Fail if dev setting is in manage.py
       run: |
@@ -38,16 +37,26 @@ jobs:
           exit 1
         fi
 
+    - name: 🚫 Fail if there are missing migrations
+      run: |
+        poetry run python moCOMOco/manage.py makemigrations --check --dry-run
+
     - name: 1️⃣ Run linter (flake8)
-      run: poetry run flake8 .
-      env:
-        POETRY_VIRTUALENVS_CREATE: false
+      run: |
+        poetry run pip install flake8
+        poetry run flake8 .
 
     - name: 2️⃣ Run tests (pytest)
-      run: poetry run pytest --disable-warnings --maxfail=1 --tb=short
+      run: |
+        poetry run pip install pytest
+        poetry run pytest --disable-warnings
 
     - name: 3️⃣ Type checking (mypy)
-      run: poetry run mypy .
+      run: |
+        poetry run pip install mypy
+        poetry run mypy .
 
     - name: 5️⃣ Security check (bandit)
-      run: poetry run bandit -r . -x tests
+      run: |
+        poetry run pip install bandit
+        poetry run bandit -r .
