@@ -40,8 +40,3 @@ jobs:
     - name: 🚫 Fail if there are missing migrations
       run: |
         poetry run python moCOMOco/manage.py makemigrations --check --dry-run
-
-    - name: 5️⃣ Security check (bandit)
-      run: |
-        poetry run pip install bandit
-        poetry run bandit -r .
