@@ -6,6 +6,8 @@ from apps.notifications.services import NotificationService
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
+        print("🧩 [Consumer.connect] scope['user'] =", self.scope.get('user'))
+        print("🔐 is_authenticated =", self.scope['user'].is_authenticated)
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.group_name = f'chat_{self.room_id}'
 
@@ -17,6 +19,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             ).exists()
         )()
         if not (self.scope['user'].is_authenticated and is_participant):
+            print("🚫 인증 실패 또는 참여자 아님 → 연결 종료")
             # 인증 실패 시 연결 끊기
             await self.close()
             return
