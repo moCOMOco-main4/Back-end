@@ -22,9 +22,11 @@ jobs:
         script: |
           cd ~/Back-end
           git pull origin dev
+          export PATH="$HOME/.local/bin:$PATH"
+          export POETRY_HOME="$HOME/.local/share/pypoetry"
           source ~/.bashrc
-          source $(poetry env info --path)/bin/activate
-          poetry install
+          $HOME/.local/bin/poetry install
+          source $($HOME/.local/bin/poetry env info --path)/bin/activate
           cd ~/Back-end/moCOMOco
           python manage.py migrate
           python manage.py collectstatic --noinput
