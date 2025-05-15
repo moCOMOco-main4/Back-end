@@ -10,8 +10,12 @@ load_dotenv(Path(__file__).resolve().parent / ".env")
 
 def main():
     """Run administrative tasks."""
+<<<<<<< Updated upstream
     env = os.getenv("DJANGO_ENV", "dev")
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{env}")
+=======
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
+>>>>>>> Stashed changes
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

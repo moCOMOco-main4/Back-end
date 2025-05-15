@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.posts.models.post import Post
 from apps.posts.serializers.post_serializers import (
     PostListSerializer,
@@ -22,6 +22,7 @@ from apps.posts.serializers.post_serializers import (
 )
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
+    authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
@@ -39,13 +40,19 @@ class PostListCreateView(generics.ListCreateAPIView):
         backend = serializer.validated_data.pop("backend", 0)
         frontend = serializer.validated_data.pop("frontend", 0)
         designer = serializer.validated_data.pop("designer", 0)
+        fullstack = serializer.validated_data.pop("fullstack", 0)
 
         # Post 인스턴스 생성
-        post = Post.objects.create(**serializer.validated_data, roles={
-            'backend': backend,
-            'frontend': frontend,
-            'designer': designer
-        })
+        post = Post.objects.create(
+            **serializer.validated_data,
+            roles={
+                'backend': backend,
+                'frontend': frontend,
+                'designer': designer,
+                'fullstack': fullstack,
+            },
+            user=self.request.user,
+        )
 
         # 현재 참여 인원이 max_people 도달 시 자동 마감
         if post.participants.count() >= post.max_people:
@@ -63,6 +70,7 @@ class PostListCreateView(generics.ListCreateAPIView):
 class MyPostListView(generics.ListAPIView):
     serializer_class = PostListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
         return Post.objects.filter(user=self.request.user).order_by('-created_at')
@@ -76,6 +84,7 @@ class MyPostListView(generics.ListAPIView):
 class ParticipatedPostListView(generics.ListAPIView):
     serializer_class = PostListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
         user = self.request.user
@@ -92,6 +101,7 @@ class ParticipatedPostListView(generics.ListAPIView):
 class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -116,9 +126,7 @@ class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     description="총인원 기준 비율로 현재 참여자 수를 보여줍니다. (예: 3/5)"
 )
 class PostDetailedRatioView(generics.RetrieveAPIView):
-    """
-    참여 비율 기반 단건 상세 조회 (프론트에서 진행률 표시 등에 활용)
-    """
     queryset = Post.objects.all()
     serializer_class = PostSimpleDetailSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]

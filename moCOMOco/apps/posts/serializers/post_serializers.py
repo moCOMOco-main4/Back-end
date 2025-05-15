@@ -14,6 +14,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
     backend = serializers.IntegerField(required=False, default=0)
     frontend = serializers.IntegerField(required=False, default=0)
     designer = serializers.IntegerField(required=False, default=0)
+    fullstack = serializers.IntegerField(required=False, default=0)
 
     class Meta:
         model = Post
@@ -21,7 +22,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'id', 'title', 'content', 'category',
             'place_name', 'address', 'latitude', 'longitude',
             'image', 'date', 'max_people', 'is_closed',
-            'backend', 'frontend', 'designer'
+            'backend', 'frontend', 'designer', 'fullstack'
         ]
 
     def create(self, validated_data):
@@ -29,7 +30,10 @@ class PostCreateSerializer(serializers.ModelSerializer):
             "backend": validated_data.pop("backend", 0),
             "frontend": validated_data.pop("frontend", 0),
             "designer": validated_data.pop("designer", 0),
+            "fullstack": validated_data.pop("fullstack", 0),
         }
+
+
         post = Post.objects.create(**validated_data, roles=roles)
         return post
 
@@ -105,6 +109,7 @@ class PostUpdateSerializer(serializers.ModelSerializer):
     backend = serializers.IntegerField(required=False, default=0)
     frontend = serializers.IntegerField(required=False, default=0)
     designer = serializers.IntegerField(required=False, default=0)
+    fullstack = serializers.IntegerField(required=False, default=0)
 
     class Meta:
         model = Post
@@ -112,7 +117,7 @@ class PostUpdateSerializer(serializers.ModelSerializer):
             'title', 'content', 'category',
             'place_name', 'address', 'latitude', 'longitude',
             'image', 'date', 'max_people', 'is_closed',
-            'backend', 'frontend', 'designer'
+            'backend', 'frontend', 'designer', 'fullstack'
         ]
 
     def update(self, instance, validated_data):
@@ -120,6 +125,7 @@ class PostUpdateSerializer(serializers.ModelSerializer):
             "backend": validated_data.pop("backend", 0),
             "frontend": validated_data.pop("frontend", 0),
             "designer": validated_data.pop("designer", 0),
+            "fullstack": validated_data.pop("fullstack", 0),
         }
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
