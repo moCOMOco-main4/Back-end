@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # .env 파일 로드 (manage.py 기준 상위 디렉토리 위치)
-load_dotenv(Path(file).resolve().parent / ".env")
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 def main():
     """Run administrative tasks."""
@@ -22,5 +22,5 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-if name == "main":
+if __name__ == "__main__":
     main()
