@@ -20,6 +20,3 @@ class PostLike(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'post'], name='unique_post_like')
         ]
-
-    def __str__(self):
-        return f"{self.user.nickname} 좋아요 → {self.post.title}"

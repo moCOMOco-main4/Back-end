@@ -4,8 +4,7 @@ from apps.posts.views.application_views import (
     ApplicationCreateView, ApplicationCancelView, MyApplicationListView,
 )
 from apps.posts.views.like_views import (
-    PostLikeCreateView, MyLikedPostListView,
-PostLikeDeleteView,
+    PostLikeCreateView, MyLikedPostListView, PostLikeDeleteView,
 )
 from apps.posts.views.schedule_views import (
     ScheduleCreateView, ScheduleUpdateView,
@@ -29,7 +28,6 @@ urlpatterns = [
     # 비율형 role_status 조회 (선형님용)
     path('<int:pk>/detailed/', PostDetailedRatioView.as_view(), name='post-detailed-ratio'),
 
-
     # 내가 작성한, 참여한 모집글 목록
     path('my/', MyPostListView.as_view(), name='my-posts'),
     path('joined/', ParticipatedPostListView.as_view(), name='joined-posts'),
@@ -50,4 +48,3 @@ urlpatterns = [
     path('schedules/<int:pk>/delete/', ScheduleDeleteView.as_view(), name='schedule-delete'),
     path('schedules/list/', ScheduleListView.as_view(), name='schedule-list'),
 ]
-
