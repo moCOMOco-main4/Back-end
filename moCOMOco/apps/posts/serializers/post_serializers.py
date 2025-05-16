@@ -7,7 +7,7 @@ from apps.posts.models.post_like import PostLike
 from apps.app_users.models import User
 
 
-# 모집글 생성용
+# 모집글 생성용 (post)
 class PostCreateListSerializer(serializers.ModelSerializer):
     # 역할군 인원 수 (프론트에서 개별 입력)
     backend = serializers.IntegerField(required=False, write_only=True, default=0)
@@ -31,9 +31,47 @@ class PostCreateListSerializer(serializers.ModelSerializer):
             "designer": validated_data.pop("designer", 0),
             "fullstack": validated_data.pop("fullstack", 0),
         }
+        # 역할군 의 합을 max_people로 설정
+        validated_data['max_people'] = sum(roles.values())
+
         post = Post.objects.create(**validated_data, roles=roles, user=self.context['user'])
         return post
 
+# 모집글 목록 조회용 (get)
+class PostListSerializer(serializers.ModelSerializer):
+    people_status = serializers.SerializerMethodField()
+    role_status = serializers.SerializerMethodField()
+    is_writer = serializers.SerializerMethodField()
+    is_applied = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = [
+            'id', 'title', 'category',
+            'place_name', 'address', 'date',
+            'image', 'is_closed', 'max_people',
+            'people_status', 'role_status',
+            'is_writer', 'is_applied', 'is_liked',
+        ]
+
+    def get_people_status(self, obj):
+        return Application.objects.filter(user=obj.user).count()
+
+    def get_role_status(self, obj):
+        return obj.roles
+
+    def get_is_writer(self, obj):
+        request = self.context.get('request')
+        return request.user == obj.user if request and request.user.is_authenticated else False
+
+    def get_is_applied(self, obj):
+        request = self.context.get('request')
+        return Application.objects.filter(post=obj, user=request.user).exists() if request and request.user.is_authenticated else False
+
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        return PostLike.objects.filter(post=obj, user=request.user).exists() if request and request.user.is_authenticated else False
 
 # 모집글 상세 조회용 (전체 정보 포함)
 class PostDetailSerializer(serializers.ModelSerializer):
@@ -114,6 +152,9 @@ class PostUpdateSerializer(serializers.ModelSerializer):
             "designer": validated_data.pop("designer", 0),
             "fullstack": validated_data.pop("fullstack", 0),
         }
+        # 역할군의 합을 max_people로 설정
+        validated_data['max_people'] = sum(roles.values())
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.roles = roles

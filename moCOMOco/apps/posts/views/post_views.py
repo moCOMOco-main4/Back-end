@@ -11,7 +11,7 @@ from apps.posts.serializers.post_serializers import (
     PostDetailSerializer,
     PostUpdateSerializer,
     PostCreateListSerializer,
-    PostSimpleDetailSerializer
+    PostSimpleDetailSerializer, PostListSerializer
 )
 
 
@@ -24,13 +24,20 @@ class PostListCreateView(generics.ListCreateAPIView):
     parser_classes = [MultiPartParser, FormParser]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['title', 'content']
-    filterset_fields = ['category']
+    filterset_fields = ['category', 'max_people']
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return PostCreateListSerializer
+        return PostListSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request, 'user': self.request.user}
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
