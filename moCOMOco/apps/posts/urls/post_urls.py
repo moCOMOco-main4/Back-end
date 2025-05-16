@@ -43,7 +43,7 @@ urlpatterns = [
     path('liked/', MyLikedPostListView.as_view(), name='liked-posts'),
 
     # 일정
-    path('schedules/', ScheduleCreateView.as_view(), name='schedule-create'),
+    path('<int:post_id>/schedules/', ScheduleCreateView.as_view(), name='schedule-create'),
     path('schedules/<int:pk>/update/', ScheduleUpdateView.as_view(), name='schedule-update'),
     path('schedules/<int:pk>/delete/', ScheduleDeleteView.as_view(), name='schedule-delete'),
     path('schedules/list/', ScheduleListView.as_view(), name='schedule-list'),

@@ -56,22 +56,22 @@ class MyPostListView(generics.ListAPIView):
         return Post.objects.filter(user=self.request.user).order_by('-created_at')
 
 
-# 내가 작성했거나 참여한 모집글 조회
+# 내가 참여한 모집글 조회
 @extend_schema(
     responses=PostCreateListSerializer,
-    description="내가 작성했거나 참여한 모집글 목록 (중복 제거)"
+    description="내가 참여한 모집글 목록"
 )
 class ParticipatedPostListView(generics.ListAPIView):
-    serializer_class = PostCreateListSerializer
+    serializer_class = PostListSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
         user = self.request.user
-        return Post.objects.filter(
-            Q(user=user) | Q(applications__user=user)
-        ).distinct().order_by('-created_at')
+        return Post.objects.filter(applications__user=user).distinct().order_by('-created_at')
 
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 # 모집글 단건 조회 + 수정 + 삭제
 @extend_schema_view(
@@ -98,6 +98,9 @@ class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == 'GET':
             return PostDetailSerializer
         return PostUpdateSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
     def get_object(self):
         post = super().get_object()

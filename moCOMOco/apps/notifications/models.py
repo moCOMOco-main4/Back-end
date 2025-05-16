@@ -34,6 +34,8 @@ class Notification(models.Model):
     participant = models.ForeignKey(
         ChatRoomParticipant,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         db_column='participant_id'
     )
     schedule = models.ForeignKey(

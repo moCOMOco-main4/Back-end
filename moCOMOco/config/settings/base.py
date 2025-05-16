@@ -263,17 +263,51 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ─── 미디어 파일 설정 (이미지만 S3에 저장) ───────────────
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-AWS_ACCESS_KEY_ID = get_env_variable("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = get_env_variable("AWS_SECRET_ACCESS_KEY")
+# === 환경변수에서 값 가져오기 ===
+AWS_S3_REGION_NAME = get_env_variable("AWS_S3_REGION_NAME")
 AWS_STORAGE_BUCKET_NAME = get_env_variable("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_REGION_NAME = get_env_variable("AWS_S3_REGION_NAME", "ap-northeast-2")
 AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
-AWS_DEFAULT_ACL = 'public-read'
-AWS_QUERYSTRING_AUTH = False
 
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+
+# === STORAGES 설정 ===
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": get_env_variable("AWS_ACCESS_KEY_ID"),
+            "secret_key": get_env_variable("AWS_SECRET_ACCESS_KEY"),
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "region_name": AWS_S3_REGION_NAME,
+            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+            "location": "media",
+            "default_acl": "public-read",
+            "file_overwrite": False,
+            "object_parameters": {
+                "CacheControl": "max-age=86400",
+            },
+            "addressing_style": "path",
+            "signature_version": "s3v4",
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+        "OPTIONS": {
+            "access_key": get_env_variable("AWS_ACCESS_KEY_ID"),
+            "secret_key": get_env_variable("AWS_SECRET_ACCESS_KEY"),
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "region_name": AWS_S3_REGION_NAME,
+            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+            "location": "static",
+            "default_acl": "public-read",
+            "object_parameters": {
+                "CacheControl": "max-age=86400",
+            },
+            "addressing_style": "path",
+            "signature_version": "s3v4",
+        },
+    },
+}
 # MEDIA_ROOT는 로컬에 사용하지 않음 (참고용 주석)
 # MEDIA_ROOT = BASE_DIR / 'media'
 

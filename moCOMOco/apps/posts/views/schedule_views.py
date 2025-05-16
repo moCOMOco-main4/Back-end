@@ -10,7 +10,7 @@ from apps.posts.serializers.schedule_serializers import (
     ScheduleListSerializer,
 )
 from apps.notifications.services import NotificationService
-
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 # 일정 등록
 @extend_schema(
@@ -24,9 +24,12 @@ class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
 
     def perform_create(self, serializer):
-        post = self.get_post(self.kwargs['post_id'])
+        post_id = self.kwargs['post_id']
+        post = self.get_post(post_id)
+
         if post.user != self.request.user:
             raise PermissionDenied("작성자만 일정을 등록할 수 있습니다.")
+
         schedule = serializer.save(post=post)
         NotificationService.send_schedule_created(schedule)
 
@@ -41,6 +44,7 @@ class ScheduleUpdateView(generics.UpdateAPIView):
     serializer_class = ScheduleUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Schedule.objects.all()
+    authentication_classes = [JWTAuthentication]
 
     def get_object(self):
         schedule = super().get_object()
@@ -57,6 +61,7 @@ class ScheduleUpdateView(generics.UpdateAPIView):
 class ScheduleDeleteView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Schedule.objects.all()
+    authentication_classes = [JWTAuthentication]
 
     def get_object(self):
         schedule = super().get_object()
@@ -68,7 +73,16 @@ class ScheduleDeleteView(generics.DestroyAPIView):
 # 일정 목록 조회
 @extend_schema(
     summary="일정 목록 조회",
-    responses=ScheduleListSerializer
+    responses=ScheduleListSerializer,
+    parameters=[
+        OpenApiParameter(
+            name='post_id',
+            type=int,
+            location=OpenApiParameter.QUERY,
+            required=True,
+            description='모집글 ID'
+        )
+    ]
 )
 class ScheduleListView(generics.ListAPIView):
     serializer_class = ScheduleListSerializer
