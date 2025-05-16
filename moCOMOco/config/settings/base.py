@@ -271,6 +271,9 @@ AWS_STORAGE_BUCKET_NAME = get_env_variable("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_REGION_NAME = get_env_variable("AWS_S3_REGION_NAME", "ap-northeast-2")
 AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+
 # MEDIA_ROOT는 로컬에 사용하지 않음 (참고용 주석)
 # MEDIA_ROOT = BASE_DIR / 'media'
 
