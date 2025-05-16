@@ -14,6 +14,7 @@ class PostCreateListSerializer(serializers.ModelSerializer):
     frontend = serializers.IntegerField(required=False, write_only=True, default=0)
     designer = serializers.IntegerField(required=False, write_only=True, default=0)
     fullstack = serializers.IntegerField(required=False, write_only=True, default=0)
+    image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Post
@@ -79,8 +80,10 @@ class PostDetailSerializer(serializers.ModelSerializer):
     is_liked = serializers.SerializerMethodField()
     is_applied = serializers.SerializerMethodField()
     current_people = serializers.SerializerMethodField()
+    people_status = serializers.SerializerMethodField()
     participants = serializers.SerializerMethodField()
     role_status = serializers.SerializerMethodField()
+    is_writer = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -90,7 +93,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'image', 'date', 'max_people', 'is_closed',
             'created_at', 'updated_at',
             'writer', 'is_liked', 'is_applied',
-            'current_people', 'participants', 'role_status'
+            'current_people', 'people_status',
+            'participants', 'role_status',
+            'is_writer'
         ]
 
     def get_writer(self, obj):
@@ -112,6 +117,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
     def get_current_people(self, obj):
         return Application.objects.filter(post=obj).count()
 
+    def get_people_status(self, obj):
+        return Application.objects.filter(post=obj).count()
+
     def get_participants(self, obj):
         # 참여자 요약 정보 리스트 (id, 닉네임, 프로필)
         return [
@@ -127,6 +135,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
         # JSONField 형태로 저장된 역할별 인원수 반환
         return obj.roles
 
+    def get_is_writer(self, obj):
+        request = self.context.get('request')
+        return request.user == obj.user if request and request.user.is_authenticated else False
 
 # 모집글 수정용
 class PostUpdateSerializer(serializers.ModelSerializer):
@@ -163,7 +174,7 @@ class PostUpdateSerializer(serializers.ModelSerializer):
 
 
 
-# 참여비율 기반 간단 상세 조회 (선형님 기준)
+# 참여비율 기반 간단 상세 조회
 class PostSimpleDetailSerializer(serializers.ModelSerializer):
     current_people = serializers.SerializerMethodField()  # 현재 신청자 수
     status = serializers.SerializerMethodField()          # UI용 상태: 모집중 / 모집완료

@@ -7,15 +7,16 @@ from drf_spectacular.utils import extend_schema
 from apps.posts.utils.mixins import PostAccessMixin
 from apps.posts.models.post import Post
 from apps.posts.models.post_like import PostLike
-from apps.posts.serializers.post_serializers import PostCreateListSerializer
+from apps.posts.serializers.post_serializers import PostListSerializer
 from apps.posts.serializers.empty_serializers import EmptySerializer
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # 즐겨찾기 추가
 @extend_schema(request=None, responses={201: EmptySerializer})
 class PostLikeCreateView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = EmptySerializer
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request, post_id):
         post = self.get_post(post_id)
@@ -32,6 +33,7 @@ class PostLikeCreateView(PostAccessMixin, APIView):
 @extend_schema(request=None, responses={204: None})
 class PostLikeDeleteView(PostAccessMixin, APIView):
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def delete(self, request, post_id):
         post = self.get_post(post_id)
@@ -47,8 +49,13 @@ class PostLikeDeleteView(PostAccessMixin, APIView):
 
 # 내가 즐겨찾기한 모집글 목록 조회
 class MyLikedPostListView(generics.ListAPIView):
-    serializer_class = PostCreateListSerializer
+    serializer_class = PostListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
-        return Post.objects.filter(liked_users__user=self.request.user)
+        user = self.request.user
+        return Post.objects.filter(liked_users__user=user).order_by('-created_at')
+
+    def get_serializer_context(self):
+        return {'request': self.request}

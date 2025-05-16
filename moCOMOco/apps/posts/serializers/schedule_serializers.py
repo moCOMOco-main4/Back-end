@@ -4,7 +4,7 @@ from apps.posts.models.schedule import Schedule
 class ScheduleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = ['id', 'post', 'date', 'description']
+        fields = ['id', 'date', 'description']
 
 
 

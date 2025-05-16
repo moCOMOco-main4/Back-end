@@ -8,11 +8,11 @@ from apps.app_users.models import User
 class ApplicationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ['post', 'role']
+        fields = ['role']
 
     def validate(self, data):
         user = self.context['request'].user
-        post = data['post']
+        post = self.context['post']
         role = data['role']
 
         # 마감 여부 확인
