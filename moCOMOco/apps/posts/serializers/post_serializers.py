@@ -86,7 +86,23 @@ class PostListSerializer(serializers.ModelSerializer):
         return current + 1
 
     def get_role_status(self, obj):
-        return obj.roles
+        from collections import defaultdict
+
+        # 역할별 신청 인원 수 계산
+        role_counts = defaultdict(int)
+        for app in Application.objects.filter(post=obj):
+            role_counts[app.role] += 1
+
+        # 작성자도 포함
+        if obj.writer_role:
+            role_counts[obj.writer_role] += 1
+
+        # 남은 인원 계산
+        remaining = {}
+        for role, max_count in obj.roles.items():
+            remaining[role] = max(0, max_count - role_counts.get(role, 0))
+
+        return remaining
 
     def get_is_writer(self, obj):
         request = self.context.get('request')
