@@ -86,6 +86,7 @@ class ScheduleDeleteView(generics.DestroyAPIView):
 )
 class ScheduleListView(generics.ListAPIView):
     serializer_class = ScheduleListSerializer
+    authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
         post_id = self.request.query_params.get('post_id')
