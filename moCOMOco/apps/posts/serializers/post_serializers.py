@@ -197,9 +197,10 @@ class PostSimpleDetailSerializer(serializers.ModelSerializer):
 
 class PostListSerializerWithParticipants(PostListSerializer):
     participants = serializers.SerializerMethodField()
+    people_status = serializers.SerializerMethodField()
 
     class Meta(PostListSerializer.Meta):
-        fields = PostListSerializer.Meta.fields + ['participants']
+        fields = PostListSerializer.Meta.fields + ['participants', 'people_status']
 
     def get_participants(self, obj):
         applications = Application.objects.filter(post=obj).select_related('user')
@@ -211,3 +212,6 @@ class PostListSerializerWithParticipants(PostListSerializer):
             }
             for app in applications
         ]
+
+    def get_people_status(self, obj):
+        return Application.objects.filter(post=obj).count()
