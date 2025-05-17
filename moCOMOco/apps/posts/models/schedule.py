@@ -9,8 +9,8 @@ class Schedule(models.Model):
         related_name='schedules',
     )
     date = models.DateTimeField()
-    description = models.CharField(max_length=255)
+    memo = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.post.title} 일정: {self.description} @ {self.date}"
+        return f"{self.post.title} 일정: {self.memo} @ {self.date}"
