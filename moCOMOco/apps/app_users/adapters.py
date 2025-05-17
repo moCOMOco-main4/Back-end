@@ -36,7 +36,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             from allauth.socialaccount.models import SocialAccount
             existing_social = SocialAccount.objects.filter(
                 provider=sociallogin.account.provider,
-                uid=sociallogin.account.uit
+                uid=sociallogin.account.uid
             ).exists()
             is_new_user = not existing_social
 
