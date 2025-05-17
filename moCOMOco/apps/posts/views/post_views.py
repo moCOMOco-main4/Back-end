@@ -11,7 +11,9 @@ from apps.posts.serializers.post_serializers import (
     PostDetailSerializer,
     PostUpdateSerializer,
     PostCreateListSerializer,
-    PostSimpleDetailSerializer, PostListSerializer
+    PostSimpleDetailSerializer,
+    PostListSerializer,
+    PostListSerializerWithParticipants,
 )
 
 
@@ -62,7 +64,7 @@ class MyPostListView(generics.ListAPIView):
     description="내가 참여한 모집글 목록"
 )
 class ParticipatedPostListView(generics.ListAPIView):
-    serializer_class = PostListSerializer
+    serializer_class = PostListSerializerWithParticipants
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
@@ -114,7 +116,7 @@ class PostDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         return post
 
 
-# 비율형 상세 조회 (선형님 기준)
+# 비율형 상세 조회
 @extend_schema(
     responses=PostSimpleDetailSerializer,
     description="총인원 기준 비율로 현재 참여자 수를 보여줍니다. (예: 3/5)"

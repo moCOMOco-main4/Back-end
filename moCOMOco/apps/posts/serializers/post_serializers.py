@@ -194,3 +194,20 @@ class PostSimpleDetailSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         current = self.get_current_people(obj)
         return "모집완료" if current >= obj.max_people else "모집중"
+
+class PostListSerializerWithParticipants(PostListSerializer):
+    participants = serializers.SerializerMethodField()
+
+    class Meta(PostListSerializer.Meta):
+        fields = PostListSerializer.Meta.fields + ['participants']
+
+    def get_participants(self, obj):
+        applications = Application.objects.filter(post=obj).select_related('user')
+        return [
+            {
+                "id": app.user.id,
+                "nickname": app.user.nickname,
+                "profile_image": app.user.profile_image.url if app.user.profile_image else None
+            }
+            for app in applications
+        ]
