@@ -28,7 +28,13 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"{role} 역할은 이 모집글에 없습니다.")
 
         # 인원 초과 여부
-        max_count = post.roles[role]
+        max_count = post.roles.get(role, 0)
+
+        # 모집인원 0이면 신청 불가
+        if max_count == 0:
+            raise serializers.ValidationError(f'{role} 역할은 모집하지 않습니다.')
+
+        # 연원 넘었는지 확인
         current_count = Application.objects.filter(post=post, role=role).count()
         if current_count >= max_count:
             raise serializers.ValidationError(f"{role} 역할 인원이 모두 찼습니다.")

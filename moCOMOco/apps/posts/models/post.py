@@ -7,6 +7,13 @@ CATEGORY_CHOICES = [
     ('project', '프로젝트'),
 ]
 
+# 역할군
+ROLE_CHOICES = [
+    ('backend', '백엔드'),
+    ('frontend', '프론트엔드'),
+    ('designer', '디자이너'),
+    ('fullstack', '풀스택'),
+]
 
 # 모집글(Post) 모델
 class Post(models.Model):
@@ -49,6 +56,13 @@ class Post(models.Model):
     # 역할별 인원 구성 (프론트, 백엔드, 디자이너 등)
     # 예시: {"frontend": 1, "backend": 2}
     roles = models.JSONField(default=dict)
+
+    # 작성자 역힐
+    writer_role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        help_text="작성자의 역할"
+    )
 
     # 생성일 / 수정일 자동 저장
     created_at = models.DateTimeField(auto_now_add=True)
