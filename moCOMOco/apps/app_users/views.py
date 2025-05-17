@@ -72,7 +72,12 @@ class UserDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request): # self를 사용하므로 static 메서드로 변환하지 않음
-        request.user.delete()
+        user = request.user
+
+        from allauth.socialaccount.models import SocialAccount
+        SocialAccount.objects.filter(user=user).delete()
+
+        user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
