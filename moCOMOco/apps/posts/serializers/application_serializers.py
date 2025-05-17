@@ -36,6 +36,10 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
 
         # 연원 넘었는지 확인
         current_count = Application.objects.filter(post=post, role=role).count()
+
+        if post.writer_role == role:
+            current_count += 1
+
         if current_count >= max_count:
             raise serializers.ValidationError(f"{role} 역할 인원이 모두 찼습니다.")
 
