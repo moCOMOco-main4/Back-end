@@ -81,7 +81,9 @@ class PostListSerializer(serializers.ModelSerializer):
         ]
 
     def get_people_status(self, obj):
-        return Application.objects.filter(user=obj.user).count()
+        total = Application.objects.filter(user=obj).count()
+
+        return total + 1
 
     def get_role_status(self, obj):
         return obj.roles
@@ -257,5 +259,6 @@ class PostListSerializerWithParticipants(PostListSerializer):
             for app in applications
         ]
 
-    def get_people_status(self, obj):
-        return Application.objects.filter(post=obj).count()
+    def get_current_people(self, obj):
+        total = Application.objects.filter(post=obj).count()
+        return total + 1

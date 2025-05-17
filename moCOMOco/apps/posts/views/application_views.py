@@ -53,11 +53,16 @@ class ApplicationCancelView(PostAccessMixin, APIView):
 
             # 모집글 자동 오픈 조건 확인
             total_current = Application.objects.filter(post=post).count()
+
+            if post.writer_role:
+                total_current += 1
+
             if post.is_closed and total_current < post.max_people:
                 post.is_closed = False
                 post.save()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
+
         except Application.DoesNotExist:
             return Response({"detail": "신청 기록이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
 

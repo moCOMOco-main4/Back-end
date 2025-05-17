@@ -15,6 +15,10 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
         post = self.context['post']
         role = data['role']
 
+        # 자기글 자기 신청 못함
+        if post.user == user:
+            raise serializers.ValidationError("자신의 글에 신청 할수 없습니다.")
+
         # 마감 여부 확인
         if post.is_closed:
             raise serializers.ValidationError("이미 마감된 모집글입니다.")
