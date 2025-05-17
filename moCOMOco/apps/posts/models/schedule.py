@@ -14,3 +14,4 @@ class Schedule(models.Model):
 
     def __str__(self):
         return f"{self.post.title} 일정: {self.memo} @ {self.date}"
+
