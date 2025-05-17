@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema
 from apps.posts.utils.mixins import PostAccessMixin
 from apps.posts.models.post import Post
 from apps.posts.models.post_like import PostLike
-from apps.posts.serializers.post_serializers import PostListSerializer
+from apps.posts.serializers.post_serializers import PostListSerializerWithParticipants
 from apps.posts.serializers.empty_serializers import EmptySerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -49,7 +49,7 @@ class PostLikeDeleteView(PostAccessMixin, APIView):
 
 # 내가 즐겨찾기한 모집글 목록 조회
 class MyLikedPostListView(generics.ListAPIView):
-    serializer_class = PostListSerializer
+    serializer_class = PostListSerializerWithParticipants
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
