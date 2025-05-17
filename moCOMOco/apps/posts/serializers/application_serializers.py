@@ -15,6 +15,10 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
         post = self.context['post']
         role = data['role']
 
+        # 자기글 자기 신청 못함
+        if post.user == user:
+            raise serializers.ValidationError("자신의 글에 신청 할수 없습니다.")
+
         # 마감 여부 확인
         if post.is_closed:
             raise serializers.ValidationError("이미 마감된 모집글입니다.")
@@ -28,8 +32,18 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"{role} 역할은 이 모집글에 없습니다.")
 
         # 인원 초과 여부
-        max_count = post.roles[role]
+        max_count = post.roles.get(role, 0)
+
+        # 모집인원 0이면 신청 불가
+        if max_count == 0:
+            raise serializers.ValidationError(f'{role} 역할은 모집하지 않습니다.')
+
+        # 연원 넘었는지 확인
         current_count = Application.objects.filter(post=post, role=role).count()
+
+        if post.writer_role == role:
+            current_count += 1
+
         if current_count >= max_count:
             raise serializers.ValidationError(f"{role} 역할 인원이 모두 찼습니다.")
 

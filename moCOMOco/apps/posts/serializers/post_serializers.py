@@ -1,10 +1,22 @@
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field
-
+import markdown
 from apps.posts.models.post import Post
 from apps.posts.models.application import Application
 from apps.posts.models.post_like import PostLike
 from apps.app_users.models import User
+from apps.posts.models.post import ROLE_CHOICES
+from rest_framework import serializers
+from apps.posts.models.post import Post
+
+
+# 한글 역할 -> 영어 역할 매핑
+POSITION_REVERSE_MAP = {
+    "백엔드": "backend",
+    "프론트엔드": "frontend",
+    "풀스택": "fullstack",
+    "디자이너": "designer"
+}
 
 
 # 모집글 생성용 (post)
@@ -22,10 +34,12 @@ class PostCreateListSerializer(serializers.ModelSerializer):
             'id', 'title', 'content', 'category',
             'place_name', 'address', 'latitude', 'longitude',
             'image', 'date', 'max_people', 'is_closed',
-            'backend', 'frontend', 'designer', 'fullstack'
+            'backend', 'frontend', 'designer', 'fullstack',
         ]
 
     def create(self, validated_data):
+        user = self.context['user']
+
         roles = {
             "backend": validated_data.pop("backend", 0),
             "frontend": validated_data.pop("frontend", 0),
@@ -35,7 +49,17 @@ class PostCreateListSerializer(serializers.ModelSerializer):
         # 역할군 의 합을 max_people로 설정
         validated_data['max_people'] = sum(roles.values())
 
-        post = Post.objects.create(**validated_data, roles=roles, user=self.context['user'])
+        writer_role = POSITION_REVERSE_MAP.get(getattr(user, 'position_name', ''), None)
+
+        if not writer_role:
+            raise serializers.ValidationError('작성자의 포지션 정보가 유효하지 않습니다.')
+
+        post = Post.objects.create(
+            **validated_data,
+            roles=roles,
+            writer_role=writer_role,
+            user=user
+        )
         return post
 
 # 모집글 목록 조회용 (get)
@@ -57,7 +81,9 @@ class PostListSerializer(serializers.ModelSerializer):
         ]
 
     def get_people_status(self, obj):
-        return Application.objects.filter(user=obj.user).count()
+        current = Application.objects.filter(post=obj).count()
+
+        return current + 1
 
     def get_role_status(self, obj):
         return obj.roles
@@ -84,11 +110,12 @@ class PostDetailSerializer(serializers.ModelSerializer):
     participants = serializers.SerializerMethodField()
     role_status = serializers.SerializerMethodField()
     is_writer = serializers.SerializerMethodField()
+    content_html = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'content', 'category',
+            'id', 'title', 'content', 'content_html', 'category',
             'place_name', 'address', 'latitude', 'longitude',
             'image', 'date', 'max_people', 'is_closed',
             'created_at', 'updated_at',
@@ -115,14 +142,14 @@ class PostDetailSerializer(serializers.ModelSerializer):
         return Application.objects.filter(user=user, post=obj).exists()
 
     def get_current_people(self, obj):
-        return Application.objects.filter(post=obj).count()
+        return Application.objects.filter(post=obj).count() + 1
 
     def get_people_status(self, obj):
-        return Application.objects.filter(post=obj).count()
+        return Application.objects.filter(post=obj).count() + 1
 
     def get_participants(self, obj):
         # 참여자 요약 정보 리스트 (id, 닉네임, 프로필)
-        return [
+        participants = [
             {
                 "id": app.user.id,
                 "nickname": app.user.nickname,
@@ -131,13 +158,32 @@ class PostDetailSerializer(serializers.ModelSerializer):
             for app in Application.objects.filter(post=obj).select_related('user')
         ]
 
+        participants.insert(0, {
+            "id": obj.user.id,
+            "nickname": obj.user.nickname,
+            "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
+        })
+
+        return participants
+
     def get_role_status(self, obj):
-        # JSONField 형태로 저장된 역할별 인원수 반환
-        return obj.roles
+        from collections import defaultdict
+        role_counts = defaultdict(int)
+
+        for app in Application.objects.filter(post=obj):
+            role_counts[app.role] += 1
+
+        if obj.writer_role:
+            role_counts[obj.writer_role] += 1
+
+        return {role: role_counts.get(role, 0) for role in obj.roles.keys()}
 
     def get_is_writer(self, obj):
         request = self.context.get('request')
         return request.user == obj.user if request and request.user.is_authenticated else False
+
+    def get_content_html(self, obj):
+        return markdown.markdown(obj.content)
 
 # 모집글 수정용
 class PostUpdateSerializer(serializers.ModelSerializer):
@@ -213,5 +259,6 @@ class PostListSerializerWithParticipants(PostListSerializer):
             for app in applications
         ]
 
-    def get_people_status(self, obj):
-        return Application.objects.filter(post=obj).count()
+    def get_current_people(self, obj):
+        total = Application.objects.filter(post=obj).count()
+        return total + 1
