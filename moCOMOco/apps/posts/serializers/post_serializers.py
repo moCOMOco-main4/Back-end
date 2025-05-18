@@ -1,14 +1,9 @@
-from rest_framework import serializers
-from drf_spectacular.utils import extend_schema_field
 import markdown
+from apps.posts.models.post_like import PostLike
+
+from rest_framework import serializers
 from apps.posts.models.post import Post
 from apps.posts.models.application import Application
-from apps.posts.models.post_like import PostLike
-from apps.app_users.models import User
-from apps.posts.models.post import ROLE_CHOICES
-from rest_framework import serializers
-from apps.posts.models.post import Post
-from config.wsgi import application
 from apps.posts.serializers.schedule_serializers import ScheduleCreateSerializer
 
 # 한글 역할 -> 영어 역할 매핑
@@ -67,6 +62,12 @@ class PostCreateListSerializer(serializers.ModelSerializer):
 
         if schedule_data:
             Schedule.objects.create(post=post, **schedule_data)
+
+        Application.objects.create(
+            post=post,
+            user=user,
+            role=writer_role  # 이미 위에서 구한 값
+        )
 
         return post
 
