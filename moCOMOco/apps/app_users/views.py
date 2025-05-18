@@ -23,7 +23,8 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.core.files.base import ContentFile
-from apps.posts.models import Post, Application, PostLike, Schedule
+from django.utils import timezone
+
 
 # S3 스토리지 인스턴스
 s3_storage = S3Boto3Storage()
@@ -88,25 +89,50 @@ class UserDetailView(APIView):
         EmailConfirmation.objects.filter(email_address__user=user).delete()
         EmailAddress.objects.filter(user=user).delete()
 
-        # 3) 알림 및 채팅 관련 데이터
-        Notification.objects.filter(user=user).delete()  # 사용자가 받은 알림 삭제
-        Notification.objects.filter(participant__user=user).delete()  # 사용자가 생성한 알림 삭제
-        ChatRoomParticipant.objects.filter(user=user).delete()  # 채팅방 참가자 삭제
-        ChatMessage.objects.filter(chat_user=user).delete()  # 채팅 메시지 삭제
+        # 3) 수정된 부분: 채팅방 참여자 삭제 전 알림 미리 생성
+        # 3-1) 사용자의 채팅방 참가자 정보 가져오기
+        participants = ChatRoomParticipant.objects.filter(user=user)
 
-        # 4) 게시물 관련 데이터
-        Schedule.objects.filter(post__user=user).delete()  # 일정 삭제
-        PostLike.objects.filter(user=user).delete()  # 좋아요 삭제
-        Application.objects.filter(user=user).delete()  # 지원서 삭제
-        Post.objects.filter(user=user).delete()  # 마지막으로 게시물 삭제
+        # 3-2) 각 채팅방에 대해 "사용자가 나갔습니다" 알림 미리 생성
+        for participant in participants:
+            room_id = participant.room_id
+            others = ChatRoomParticipant.objects.filter(room_id=room_id).exclude(user=user)
 
-        # 5) 토큰 관련
+            for other in others:
+                Notification.objects.create(
+                    user=other.user,
+                    chat_message=None,
+                    participant=None,  # participant 필드를 NULL로 설정
+                    type='chat_leave',
+                    content=f"{user.get_username()}님이 방을 나갔습니다.",
+                    url=f"/chat/{room_id}/",
+                    is_read=False,
+                    created_at=timezone.now()
+                )
+
+        # 3-3) 알림 및 채팅 관련 데이터 삭제
+        Notification.objects.filter(user=user).delete()
+        ChatMessage.objects.filter(chat_user=user).delete()
+        ChatRoomParticipant.objects.filter(user=user).delete()
+
+        # 3-4) Posts 관련 데이터
+        from apps.posts.models import Post, Application, PostLike, Schedule
+        Schedule.objects.filter(post__user=user).delete()
+        PostLike.objects.filter(user=user).delete()
+        Application.objects.filter(user=user).delete()
+        Post.objects.filter(user=user).delete()
+
+        # 4) REST Token, JWT Refresh, JWT Refresh
         Token.objects.filter(user=user).delete()
         for tk in OutstandingToken.objects.filter(user=user):
             BlacklistedToken.objects.get_or_create(token=tk)
+
+        # 5) 세션 로그아웃
         logout(request)
 
+        # 6) 사용자 삭제
         user.delete()
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema(
