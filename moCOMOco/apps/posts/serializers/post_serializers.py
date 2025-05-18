@@ -1,6 +1,6 @@
 import markdown
 from apps.posts.models.post_like import PostLike
-
+from apps.posts.models.schedule import Schedule
 from rest_framework import serializers
 from apps.posts.models.post import Post
 from apps.posts.models.application import Application
