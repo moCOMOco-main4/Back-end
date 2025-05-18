@@ -47,7 +47,7 @@ class NotificationService:
         for p in others:
             Notification.objects.create(
                 user=p.user,
-                participant=participant,
+                participant=None,
                 chat_message=None,
                 type='chat_leave',
                 content=f"{participant.user.get_username()}님이 방을 나갔습니다.",
