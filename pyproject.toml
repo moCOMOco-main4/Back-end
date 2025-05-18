@@ -33,6 +33,7 @@ django-filter = "^25.1"
 redis = "^6.1.0"
 redis-cli = "^1.0.1"
 markdown = "^3.8"
+bleach = "^6.2.0"
 
 [build-system]
 requires    = ["poetry-core>=2.0.0,<3.0.0"]

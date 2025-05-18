@@ -1,4 +1,4 @@
-import markdown
+from apps.posts.utils.markdown import render_markdown
 from apps.posts.models.post_like import PostLike
 from apps.posts.models.schedule import Schedule
 from rest_framework import serializers
@@ -210,7 +210,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
         return request.user == obj.user if request and request.user.is_authenticated else False
 
     def get_content_html(self, obj):
-        return markdown.markdown(obj.content)
+        return render_markdown(obj.content)
 
 # 모집글 수정용
 class PostUpdateSerializer(serializers.ModelSerializer):
