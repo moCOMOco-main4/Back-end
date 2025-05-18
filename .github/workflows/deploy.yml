@@ -9,43 +9,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: SSH and Deploy
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          set -e
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
 
-          # 프로젝트 폴더로 이동
-          cd ~/Back-end
+            # 1) 프로젝트 폴더로 이동
+            cd ~/Back-end
 
-          # bash 설정 로드
-          source ~/.bashrc || true
+            # 2) bash 설정 로드
+            source ~/.bashrc || true
 
-          # Poetry 바이너리 경로 추가
-          export PATH="$HOME/.poetry/bin:$HOME/.local/bin:$PATH"
+            # 3) Poetry 바이너리 경로 추가
+            export PATH="$HOME/.poetry/bin:$HOME/.local/bin:$PATH"
 
-          # 최신 코드 반영
-          git pull origin dev
+            # 4) 최신 코드 반영
+            git pull origin dev
 
-          # 의존성 설치 (풀 경로 사용)
-          if command -v poetry > /dev/null; then
-            poetry install
-          else
-            "$HOME/.poetry/bin/poetry" install
-          fi
+            # 5) 의존성 설치
+            poetry install --no-interaction --no-ansi
 
-          # 마이그레이션 & 정적파일 수집
-          cd moCOMOco
-          poetry run python manage.py migrate
-          poetry run python manage.py collectstatic --noinput
+            # 6) 마이그레이션 & 정적파일 수집
+            cd ~/Back-end/moCOMOco
+            poetry run python manage.py migrate
+            poetry run python manage.py collectstatic --noinput
 
-          # 서비스 재시작
-          sudo systemctl restart uvicorn
-          sudo systemctl restart gunicorn
-          sudo systemctl reload nginx
+            # 7) 서비스 재시작
+            sudo systemctl restart uvicorn
+            sudo systemctl restart gunicorn
+            sudo systemctl reload nginx
