@@ -9,6 +9,7 @@ from apps.posts.models.post import ROLE_CHOICES
 from rest_framework import serializers
 from apps.posts.models.post import Post
 from config.wsgi import application
+from apps.posts.serializers.schedule_serializers import ScheduleCreateSerializer
 
 # 한글 역할 -> 영어 역할 매핑
 POSITION_REVERSE_MAP = {
@@ -27,6 +28,7 @@ class PostCreateListSerializer(serializers.ModelSerializer):
     designer = serializers.IntegerField(required=False, write_only=True, default=0)
     fullstack = serializers.IntegerField(required=False, write_only=True, default=0)
     image = serializers.ImageField(required=False, allow_null=True)
+    schedule = ScheduleCreateSerializer(required=False)
 
     class Meta:
         model = Post
@@ -35,10 +37,12 @@ class PostCreateListSerializer(serializers.ModelSerializer):
             'place_name', 'address', 'latitude', 'longitude',
             'image', 'date', 'max_people', 'is_closed',
             'backend', 'frontend', 'designer', 'fullstack',
+            'schedule'
         ]
 
     def create(self, validated_data):
         user = self.context['user']
+        schedule_data = validated_data.pop('schedule', None)
 
         roles = {
             "backend": validated_data.pop("backend", 0),
@@ -60,6 +64,10 @@ class PostCreateListSerializer(serializers.ModelSerializer):
             writer_role=writer_role,
             user=user
         )
+
+        if schedule_data:
+            Schedule.objects.create(post=post, **schedule_data)
+
         return post
 
 # 모집글 목록 조회용 (get)
