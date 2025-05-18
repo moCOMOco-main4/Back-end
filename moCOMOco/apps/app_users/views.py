@@ -92,7 +92,7 @@ class UserDetailView(APIView):
         # 3-1) Posts 관련 데이터
         from apps.posts.models import Post, Application, PostLike, Schedule
         # 사용자가 쓴 포스트, 지원, 좋아요, 스케줄 삭제
-        Post.objects.filter(author=user).delete()
+        Post.objects.filter(user=user).delete()
         Application.objects.filter(user=user).delete()
         PostLike.objects.filter(user=user).delete()
         Schedule.objects.filter(user=user).delete()
