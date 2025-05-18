@@ -1,3 +1,4 @@
+from allauth.account.utils import user_email
 from django.core.files.base import ContentFile
 from storages.backends.s3boto3 import S3Boto3Storage
 from rest_framework import status
@@ -20,6 +21,9 @@ from apps.notifications.models import Notification
 from django.db import transaction
 from apps.posts.models import PostLike, Application, Schedule, Post
 from allauth.socialaccount.models import SocialAccount
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Position 매핑
@@ -76,42 +80,48 @@ class UserDetailView(APIView):
             return Response(UserDetailSerializer(request.user).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        user = request.user
+        user_email = user.email  # 사용자 이메일 저장
 
-def delete(self, request):
-    user = request.user
+        # 트랜잭션 처리로 모든 삭제가 성공하거나 모두 실패하도록 보장
+        with transaction.atomic():
+            try:
+                # 로깅 시작
+                logger.info(f"회원 탈퇴 시작: {user_email} (ID: {user.id})")
 
-    # 트랜잭션 처리로 모든 삭제가 성공하거나 모두 실패하도록 보장
-    with transaction.atomic():
-        try:
-            # 알림 삭제
-            Notification.objects.filter(user=user).delete()
+                # 알림 삭제
+                Notification.objects.filter(user=user).delete()
 
-            # 게시물 관련 데이터 삭제
-            PostLike.objects.filter(user=user).delete()
-            Application.objects.filter(user=user).delete()
+                # 게시물 관련 데이터 삭제
+                PostLike.objects.filter(user=user).delete()
+                Application.objects.filter(user=user).delete()
 
-            # 사용자가 작성한 게시물 관련 삭제
-            user_posts = Post.objects.filter(user=user)
-            Schedule.objects.filter(post__in=user_posts).delete()
-            user_posts.delete()
+                # 사용자가 작성한 게시물 관련 삭제
+                user_posts = Post.objects.filter(user=user)
+                Schedule.objects.filter(post__in=user_posts).delete()
+                user_posts.delete()
 
-            # 채팅 관련 삭제
-            ChatMessage.objects.filter(chat_user=user).delete()
-            ChatRoomParticipant.objects.filter(user=user).delete()
+                # 채팅 관련 삭제
+                ChatMessage.objects.filter(chat_user=user).delete()
+                ChatRoomParticipant.objects.filter(user=user).delete()
 
-            # 소셜 계정 삭제
-            SocialAccount.objects.filter(user=user).delete()
+                # 소셜 계정 삭제
+                SocialAccount.objects.filter(user=user).delete()
 
-            # 마지막으로 사용자 삭제
-            user.delete()
+                # 마지막으로 사용자 삭제
+                user.delete()
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
+                # 로깅 완료
+                logger.info(f"회원 탈퇴 완료: {user_email}")
 
-        except Exception as e:
-            # 로깅 추가 (실제 환경에서는 logger 사용 권장)
-            print(f"사용자 삭제 중 오류 발생: {str(e)}")
-            return Response({"error": "회원 탈퇴 중 오류가 발생했습니다."},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+
+            except Exception as e:
+                # 로깅
+                logger.error(f"회원 탈퇴 실패: {user_email} - {str(e)}")
+                return Response({"error": "회원 탈퇴 중 오류가 발생했습니다."},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @extend_schema(
