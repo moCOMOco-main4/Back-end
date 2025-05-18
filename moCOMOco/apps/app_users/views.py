@@ -77,13 +77,11 @@ class UserDetailView(APIView):
     def delete(self, request): # self를 사용하므로 static 메서드로 변환하지 않음
         user = request.user
 
-        SocialAccount.objects.filter(user=user).delete()
-
-        ChatRoomParticipant.objects.filter(user=user).delete()
-
-        ChatMessage.objects.filter(chat_user=user).delete()
-
         Notification.objects.filter(user=user).delete()
+
+        SocialAccount.objects.filter(user=user).delete()
+        ChatMessage.objects.filter(chat_user=user).delete()
+        ChatRoomParticipant.objects.filter(user=user).delete()
 
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
