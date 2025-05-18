@@ -395,6 +395,21 @@ files = [
 ]
 
 [[package]]
+name = "cont"
+version = "0.0.1"
+description = "Utility to manage containers"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "cont-0.0.1-py3-none-any.whl", hash = "sha256:079b90df4cbf60fde573d4c7f32f1c558bee0337ee35fa1be591f22d02c88958"},
+    {file = "cont-0.0.1.tar.gz", hash = "sha256:fb215f144a47470d3152e8d9a7fef55dd608b0651d1bc8178bf9418f38698a2f"},
+]
+
+[package.dependencies]
+docopt = "*"
+
+[[package]]
 name = "cryptography"
 version = "44.0.3"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
@@ -637,6 +652,17 @@ doc = ["Sphinx (>=1.6.5,<2)", "sphinx_rtd_theme (>=0.1.9)"]
 lint = ["pre-commit", "pyupgrade", "ruff", "yesqa"]
 python-jose = ["python-jose (==3.3.0)"]
 test = ["cryptography", "freezegun", "pytest", "pytest-cov", "pytest-django", "pytest-xdist", "tox"]
+
+[[package]]
+name = "docopt"
+version = "0.6.2"
+description = "Pythonic argument parser, that will make you smile"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
+]
 
 [[package]]
 name = "dotenv"
@@ -1602,4 +1628,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "b09f8f908a4b857181a7862cb04f2e7259907cc406dcf19ed2edc48c90b2253a"
+content-hash = "6dd233fe0f034744cacf6fb5e0b4387b4ccbc41dd7e51bd7375ebd314db8c3f9"
