@@ -155,7 +155,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
         return {
             "id": obj.user.id,
             "nickname": obj.user.nickname,
-            "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
+            "profile_image": obj.user.profile_image if obj.user.profile_image else None
         }
 
     def get_is_liked(self, obj):
@@ -188,7 +188,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             participants.insert(0, {
                 "id": obj.user.id,
                 "nickname": obj.user.nickname,
-                "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
+                "profile_image": obj.user.profile_image if obj.user.profile_image else None
             })
 
         return participants
@@ -282,7 +282,7 @@ class PostListSerializerWithParticipants(PostListSerializer):
             {
                 "id": app.user.id,
                 "nickname": app.user.nickname,
-                "profile_image": app.user.profile_image.url if app.user.profile_image else None
+                "profile_image": app.user.profile_image if app.user.profile_image else None
             }
             for app in applications
         ]
@@ -292,7 +292,7 @@ class PostListSerializerWithParticipants(PostListSerializer):
             participant_list.insert(0, {
                 "id": obj.user.id,
                 "nickname": obj.user.nickname,
-                "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
+                "profile_image": obj.user.profile_image if obj.user.profile_image else None
             })
 
         return participant_list
