@@ -183,11 +183,13 @@ class PostDetailSerializer(serializers.ModelSerializer):
             for app in Application.objects.filter(post=obj).select_related('user')
         ]
 
-        participants.insert(0, {
-            "id": obj.user.id,
-            "nickname": obj.user.nickname,
-            "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
-        })
+        # 작성자가 이미 포함되지 않은 경우에만 수동 삽입
+        if obj.user.id not in [p['id'] for p in participants]:
+            participants.insert(0, {
+                "id": obj.user.id,
+                "nickname": obj.user.nickname,
+                "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
+            })
 
         return participants
 
@@ -274,28 +276,23 @@ class PostListSerializerWithParticipants(PostListSerializer):
         fields = PostListSerializer.Meta.fields + ['participants', 'people_status']
 
     def get_participants(self, obj):
-        applications =Application.objects.filter(post=obj).select_related('user')
+        applications = Application.objects.filter(post=obj).select_related('user')
 
-        # 신청자 생성
         participant_list = [
             {
                 "id": app.user.id,
                 "nickname": app.user.nickname,
-                'profile_image': app.user.profile_image.url if app.user.profile_image else None
-
+                "profile_image": app.user.profile_image.url if app.user.profile_image else None
             }
             for app in applications
         ]
 
-        # 작성자도 참여자에 포함
+        # 작성자가 이미 포함되지 않았다면 추가
         if obj.user.id not in [p['id'] for p in participant_list]:
             participant_list.insert(0, {
                 "id": obj.user.id,
                 "nickname": obj.user.nickname,
                 "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
             })
-        return participant_list
 
-    def get_people_status(self, obj):
-        totla = Application.objects.filter(post=obj).count()
-        return totla + 1
+        return participant_list
