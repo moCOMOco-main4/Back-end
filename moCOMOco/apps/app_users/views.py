@@ -80,25 +80,30 @@ class UserDetailView(APIView):
         """
         user = request.user
 
+        # 1) 소셜 토큰/계정
         SocialToken.objects.filter(account__user=user).delete()
         SocialAccount.objects.filter(user=user).delete()
 
+        # 2) 이메일 주소/인증
         EmailConfirmation.objects.filter(email_address__user=user).delete()
         EmailAddress.objects.filter(user=user).delete()
 
-        ChatRoomParticipant.objects.filter(user=user).delete()
-        ChatMessage.objects.filter(chat_user=user).delete()
-        Notification.objects.filter(user=user).delete()
+        # 3) 알림 및 채팅 관련 데이터
+        Notification.objects.filter(user=user).delete()  # 사용자가 받은 알림 삭제
+        Notification.objects.filter(participant__user=user).delete()  # 사용자가 생성한 알림 삭제
+        ChatRoomParticipant.objects.filter(user=user).delete()  # 채팅방 참가자 삭제
+        ChatMessage.objects.filter(chat_user=user).delete()  # 채팅 메시지 삭제
 
-        Schedule.objects.filter(post__user=user).delete()
-        PostLike.objects.filter(user=user).delete()
-        Application.objects.filter(user=user).delete()
-        Post.objects.filter(user=user).delete()
+        # 4) 게시물 관련 데이터
+        Schedule.objects.filter(post__user=user).delete()  # 일정 삭제
+        PostLike.objects.filter(user=user).delete()  # 좋아요 삭제
+        Application.objects.filter(user=user).delete()  # 지원서 삭제
+        Post.objects.filter(user=user).delete()  # 마지막으로 게시물 삭제
 
+        # 5) 토큰 관련
         Token.objects.filter(user=user).delete()
         for tk in OutstandingToken.objects.filter(user=user):
             BlacklistedToken.objects.get_or_create(token=tk)
-
         logout(request)
 
         user.delete()
