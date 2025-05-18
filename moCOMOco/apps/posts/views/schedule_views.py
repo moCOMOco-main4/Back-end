@@ -91,4 +91,6 @@ class ScheduleListView(generics.ListAPIView):
 
     def get_queryset(self):
         post_ids = self.request.query_params.getlist('post_id')
+        if not post_ids:
+            return Schedule.objects.none()
         return Schedule.objects.filter(post_id__in=post_ids).order_by('date')

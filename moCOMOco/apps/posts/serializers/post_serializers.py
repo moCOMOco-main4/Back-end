@@ -49,7 +49,6 @@ class PostCreateListSerializer(serializers.ModelSerializer):
         validated_data['max_people'] = sum(roles.values())
 
         writer_role = POSITION_REVERSE_MAP.get(getattr(user, 'position_name', ''), None)
-
         if not writer_role:
             raise serializers.ValidationError('작성자의 포지션 정보가 유효하지 않습니다.')
 
@@ -60,14 +59,15 @@ class PostCreateListSerializer(serializers.ModelSerializer):
             user=user
         )
 
+        # 일정 자동 생성 (프론트가 schedule 명시 안해도 생성되도록)
         if schedule_data:
             Schedule.objects.create(post=post, **schedule_data)
-
-        Application.objects.create(
-            post=post,
-            user=user,
-            role=writer_role  # 이미 위에서 구한 값
-        )
+        elif post.date:
+            Schedule.objects.create(
+                post=post,
+                date=post.date,
+                memo=f"{post.title} 일정"  # 또는 "기본 일정" 등으로 커스터마이징 가능
+            )
 
         return post
 
