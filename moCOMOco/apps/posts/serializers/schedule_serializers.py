@@ -17,7 +17,7 @@ class ScheduleUpdateSerializer(serializers.ModelSerializer):
 class ScheduleListSerializer(serializers.ModelSerializer):
     post_id = serializers.IntegerField(source='post.id', read_only=True)
     post_title = serializers.CharField(source='post.title', read_only=True)
-    post_data = serializers.DateTimeField(source='post.data', read_only=True)
+    post_date = serializers.DateField(source='post.date', read_only=True)
 
     class Meta:
         model = Schedule
