@@ -73,7 +73,9 @@ class ParticipatedPostListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Post.objects.filter(applications__user=user).distinct().order_by('-created_at')
+        return Post.objects.filter(
+            Q(applications__user=user) | Q(user=user)
+        ).distinct().order_by('-created_at')
 
     def get_serializer_context(self):
         return {'request': self.request}
