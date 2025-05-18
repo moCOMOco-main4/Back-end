@@ -1,44 +1,35 @@
-from allauth.account.utils import user_email
-from django.core.files.base import ContentFile
-from storages.backends.s3boto3 import S3Boto3Storage
+# apps/app_users/views.py
+from django.contrib.auth import logout
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes, parser_classes
+
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount, SocialToken
+from apps.chat.models import ChatRoomParticipant, ChatMessage
+from apps.notifications.models import Notification
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
 from .models import User
 from .serializers import (
-    UserDetailSerializer, UserUpdateSerializer, PositionSerializer,
+    UserDetailSerializer, UserUpdateSerializer,
+    PositionSerializer, UserProfileSerializer
 )
-from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
-from django.shortcuts import get_object_or_404
-from .serializers import UserProfileSerializer
-from apps.chat.models import ChatRoomParticipant, ChatMessage
-from apps.notifications.models import Notification
-from django.db import transaction
-from apps.posts.models import PostLike, Application, Schedule, Post
-from allauth.socialaccount.models import SocialAccount
-import logging
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.core.files.base import ContentFile
 
-logger = logging.getLogger(__name__)
-
-
-# Position 매핑
-POSITION_NAMES = {
-    1: "백엔드",
-    2: "프론트엔드",
-    3: "풀스택",
-    4: "디자이너"
-}
-
-# s3 스토리지 인스턴스 생성
+# S3 스토리지 인스턴스
 s3_storage = S3Boto3Storage()
 
+# Position 헬퍼 함수 및 응답 준비
+POSITION_NAMES = {1: "백엔드", 2: "프론트엔드", 3: "풀스택", 4: "디자이너"}
 def _update_user_position(user, position):
-    """사용자 포지션 업데이트 헬퍼 함수"""
     if position not in POSITION_NAMES:
         raise ValueError("유효하지 않은 포지션 값입니다.")
     user.position = position
@@ -46,187 +37,96 @@ def _update_user_position(user, position):
     user.save()
 
 def _prepare_position_response(user, position_value):
-    """포지션 응답 데이터 준비 헬퍼 함수 (중복 코드 제거)"""
     _update_user_position(user, position_value)
-    return {
-        'user_id': user.id,
-        'position_id': user.position,
-        'position_name': user.position_name,
-    }
+    return {'user_id': user.id, 'position_id': user.position, 'position_name': user.position_name}
 
 class UserDetailView(APIView):
-    """현재 사용자 정보 조회 API 뷰"""
+    """회원 정보 조회, 수정, 탈퇴(APIView)"""
     permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get(self, request):
-        # self를 사용하므로 static 메서드로 변환하지 않음
         serializer = UserDetailSerializer(request.user)
         return Response(serializer.data)
 
     def patch(self, request):
         serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
-        # 이피지 파일 처리 기능 수정(S3Boto3 사용)
         if 'profile_image_file' in request.FILES:
-            uploaded_file =  request.FILES['profile_image_file']
-            # 이미지 저장 경로 변경(S3Boto3 변경)
+            uploaded_file = request.FILES['profile_image_file']
             file_name = f"profile_images/user_{request.user.id}_{uploaded_file.name}"
             s3_storage.save(file_name, ContentFile(uploaded_file.read()))
-            # S3 URL 생성
-            file_url = s3_storage.url(file_name)
-            request.data['profile_image'] = file_url
-
+            request.data['profile_image'] = s3_storage.url(file_name)
         if serializer.is_valid():
             serializer.save()
             return Response(UserDetailSerializer(request.user).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
+        """
+        회원 탈퇴 처리:
+        1) SocialToken 및 SocialAccount 삭제
+        2) EmailAddress, ChatRoomParticipant, ChatMessage, Notification 정리
+        3) JWT 토큰 블랙리스트 처리
+        4) 세션 로그아웃
+        5) User 레코드 삭제
+        """
         user = request.user
-        user_email = user.email  # 사용자 이메일 저장
-
-        # 트랜잭션 처리로 모든 삭제가 성공하거나 모두 실패하도록 보장
-        with transaction.atomic():
-            try:
-                # 로깅 시작
-                logger.info(f"회원 탈퇴 시작: {user_email} (ID: {user.id})")
-
-                # 알림 삭제
-                Notification.objects.filter(user=user).delete()
-
-                # 게시물 관련 데이터 삭제
-                PostLike.objects.filter(user=user).delete()
-                Application.objects.filter(user=user).delete()
-
-                # 사용자가 작성한 게시물 관련 삭제
-                user_posts = Post.objects.filter(user=user)
-                Schedule.objects.filter(post__in=user_posts).delete()
-                user_posts.delete()
-
-                # 채팅 관련 삭제
-                ChatMessage.objects.filter(chat_user=user).delete()
-                ChatRoomParticipant.objects.filter(user=user).delete()
-
-                # 소셜 계정 삭제
-                SocialAccount.objects.filter(user=user).delete()
-
-                # 마지막으로 사용자 삭제
-                user.delete()
-
-                # 로깅 완료
-                logger.info(f"회원 탈퇴 완료: {user_email}")
-
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-            except Exception as e:
-                # 로깅
-                logger.error(f"회원 탈퇴 실패: {user_email} - {str(e)}")
-                return Response({"error": "회원 탈퇴 중 오류가 발생했습니다."},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        # 1) 소셜 로그인 토큰 및 계정 삭제
+        SocialToken.objects.filter(account__user=user).delete()
+        SocialAccount.objects.filter(user=user).delete()
+        # 2) 이메일 주소 및 기타 관계 데이터 삭제
+        EmailAddress.objects.filter(user=user).delete()
+        ChatRoomParticipant.objects.filter(user=user).delete()
+        ChatMessage.objects.filter(chat_user=user).delete()
+        Notification.objects.filter(user=user).delete()
+        # 3) JWT Refresh Token 블랙리스트 처리
+        for token in OutstandingToken.objects.filter(user=user):
+            BlacklistedToken.objects.get_or_create(token=token)
+        # 4) 세션 로그아웃
+        logout(request)
+        # 5) 사용자 레코드 삭제
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema(
-    request={
-        'multipart/form-data': {
-            'type': 'object',
-            'properties': {
-                'profile_image_file': {
-                    'type': 'string',
-                    'format': 'binary'
-                }
-            }
-        }
-    },
-    parameters=[
-        OpenApiParameter(
-            name='profile_image_file',
-            description='업로드할 프로필 이미지',
-            required=True,
-            type=OpenApiTypes.BINARY,
-            location= "form"
-        )
-    ]
+    request={'multipart/form-data': {'type': 'object','properties':{'profile_image_file':{'type':'string','format':'binary'}}}},
+    parameters=[OpenApiParameter(name='profile_image_file', description='업로드할 프로필 이미지', required=True, type=OpenApiTypes.BINARY, location='form')]
 )
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@parser_classes([MultiPartParser, FormParser])  # 명시적으로 파서 클래스 지정
+@parser_classes([MultiPartParser, FormParser])
 def upload_profile_image(request):
-    """프로필 이미지 업로드 전용 엔드포인트"""
     if 'profile_image_file' not in request.FILES:
-        return Response({
-            'error': '이미지 파일이 제공되지 않았습니다.'
-        }, status=status.HTTP_400_BAD_REQUEST)
-
+        return Response({'error': '이미지 파일이 제공되지 않았습니다.'}, status=status.HTTP_400_BAD_REQUEST)
     uploaded_file = request.FILES['profile_image_file']
-
-    # 이미지 파일 타입 검증 (선택사항)
     if not uploaded_file.content_type.startswith('image/'):
-        return Response({
-            'error': '유효한 이미지 파일이 아닙니다.'
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    # S3Boto#Storage를 사용하여 S3에 파일 업로드
+        return Response({'error': '유효한 이미지 파일이 아닙니다.'}, status=status.HTTP_400_BAD_REQUEST)
     try:
         file_name = f"profile_images/user_{request.user.id}_{uploaded_file.name}"
         s3_storage.save(file_name, ContentFile(uploaded_file.read()))
-        file_url = s3_storage.url(file_name)   # S3 URL 생성
-
-        #사용자 프로필 업데이트
+        file_url = s3_storage.url(file_name)
         user = request.user
         user.profile_image = file_url
         user.save(update_fields=['profile_image'])
-
-        return Response({
-            'profile_image': file_url,
-            'user': UserDetailSerializer(user).data,
-            'message': '프로필 이미지가 성공적으로 S3에 업로드되었습니다.'
-
-        }, status=status.HTTP_200_OK)
-
+        return Response({'profile_image': file_url, 'user': UserDetailSerializer(user).data, 'message': '프로필 이미지 업로드 성공'}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({
-            'error': f'이미지 업로드 중 오류가 발생했습니다: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        return Response({'error': f'업로드 중 오류: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PositionView(APIView):
-    """사용자 포지션 관리 API 뷰"""
     permission_classes = [IsAuthenticated]
-
     def post(self, request):
-        # self를 사용하므로 static 메서드로 변환하지 않음
         serializer = PositionSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response_data = _prepare_position_response(
-                request.user,
-                serializer.validated_data['position']
-            )
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not serializer.is_valid(): return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try: return Response(_prepare_position_response(request.user, serializer.validated_data['position']), status=status.HTTP_201_CREATED)
+        except ValueError as e: return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     def patch(self, request):
         serializer = PositionSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            response_data = _prepare_position_response(
-                request.user,
-                serializer.validated_data['position']
-            )
-            return Response(response_data, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not serializer.is_valid(): return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try: return Response(_prepare_position_response(request.user, serializer.validated_data['position']), status=status.HTTP_200_OK)
+        except ValueError as e: return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileView(APIView):
-    """다른 사용자의 프로필 정보를 조회하는 API View"""
-    permission_classes = [IsAuthenticated] # 로그인한 사용자만 접근 가능
-
+    permission_classes = [IsAuthenticated]
     def get(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
-        serializer = UserProfileSerializer(user)
-        return Response(serializer.data)
+        return Response(UserProfileSerializer(user).data)
