@@ -3,6 +3,8 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django.db.models import Q
+from apps.posts.serializers.schedule_serializers import ScheduleCreateSerializer
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -27,6 +29,7 @@ class PostListCreateView(generics.ListCreateAPIView):
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['title', 'content']
     filterset_fields = ['category', 'max_people']
+    schedule = ScheduleCreateSerializer(required=False)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -75,7 +78,7 @@ class ParticipatedPostListView(generics.ListAPIView):
     def get_serializer_context(self):
         return {'request': self.request}
 
-# 모집글 단건 조회 + 수정 + 삭제
+# 모집글 상세 조회 + 수정 + 삭제
 @extend_schema_view(
     get=extend_schema(
         summary="모집글 상세 조회",
