@@ -72,9 +72,12 @@ class ChatMessageSerializer(serializers.ModelSerializer):
 
     def get_profile_image(self, obj):
         user = obj.chat_user
-        if hasattr(user, 'profile_image') and user.profile_image:
-            return user.profile_image.url
-        return None
+        profile = getattr(user, 'profile_image', None) # 1) getattr 로 안전하게 꺼내고
+        if hasattr(profile, 'url'): # 2) FileField / ImageField 인스턴스면 .url 반환
+            return profile.url
+        if isinstance(profile, str): # 3) 이미 문자열로 저장된 URL/경로라면 그대로 반환
+            return profile
+        return None # 4) 그 외(없거나 빈값)에는 None
 
 class ChatMessageCreateSerializer(serializers.ModelSerializer):
     content = serializers.CharField()
