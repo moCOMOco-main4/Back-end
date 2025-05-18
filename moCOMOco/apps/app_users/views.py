@@ -76,35 +76,6 @@ class UserDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def delete(self, request):
-    user = request.user
-
-    with transaction.atomic():
-        try:
-            # 알림 삭제
-            Notification.objects.filter(user=user).delete()
-
-            # 게시물 관련 데이터 삭제
-            PostLike.objects.filter(user=user).delete()
-            Application.objects.filter(user=user).delete()
-
-            # 사용자가 작성한 게시물 관련 삭제
-            user_posts = Post.objects.filter(user=user)
-            Schedule.objects.filter(post__in=user_posts).delete()
-            user_posts.delete()
-
-            # 채팅 관련 삭제
-            ChatMessage.objects.filter(chat_user=user).delete()
-            ChatRoomParticipant.objects.filter(user=user).delete()
-
-            # 소셜 계정 삭제
-            SocialAccount.objects.filter(user=user).delete()
-
-            # 마지막으로 사용자 삭제
-            user.delete()
-
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
         except Exception as e:
             # 로깅 추가 (실제 환경에서는 logger 사용 권장)
             print(f"사용자 삭제 중 오류 발생: {str(e)}")
