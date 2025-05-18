@@ -72,15 +72,16 @@ class ScheduleDeleteView(generics.DestroyAPIView):
 
 # 일정 목록 조회
 @extend_schema(
-    summary="일정 목록 조회",
+    summary="일정 목록 조회 (여러 post_id 가능)",
     responses=ScheduleListSerializer,
     parameters=[
         OpenApiParameter(
             name='post_id',
-            type=int,
+            type={'type': 'array', 'items': {'type': 'integer'}},
             location=OpenApiParameter.QUERY,
             required=True,
-            description='모집글 ID'
+            explode=True,
+            description='여러 모집글 ID (예: ?post_id=1&post_id=2&post_id=3)'
         )
     ]
 )
@@ -89,5 +90,5 @@ class ScheduleListView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
-        post_id = self.request.query_params.get('post_id')
-        return Schedule.objects.filter(post_id=post_id).order_by('date')
+        post_ids = self.request.query_params.getlist('post_id')
+        return Schedule.objects.filter(post_id__in=post_ids).order_by('date')

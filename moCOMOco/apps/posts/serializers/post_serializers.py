@@ -275,6 +275,6 @@ class PostListSerializerWithParticipants(PostListSerializer):
             for app in applications
         ]
 
-    def get_current_people(self, obj):
+    def get_people_status(self, obj):
         total = Application.objects.filter(post=obj).count()
         return total + 1
