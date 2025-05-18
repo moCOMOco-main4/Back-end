@@ -1,4 +1,3 @@
-# apps/app_users/views.py
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -24,6 +23,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.core.files.base import ContentFile
+from apps.posts.models import Post, Application, PostLike, Schedule
 
 # S3 스토리지 인스턴스
 s3_storage = S3Boto3Storage()
@@ -79,30 +79,28 @@ class UserDetailView(APIView):
         6) User 레코드 삭제
         """
         user = request.user
-        # 1) 소셜 토큰/계정
+
         SocialToken.objects.filter(account__user=user).delete()
         SocialAccount.objects.filter(user=user).delete()
-        # 2) 이메일 주소/인증
+
         EmailConfirmation.objects.filter(email_address__user=user).delete()
         EmailAddress.objects.filter(user=user).delete()
-        # 3) 기타 연관 데이터
+
         ChatRoomParticipant.objects.filter(user=user).delete()
         ChatMessage.objects.filter(chat_user=user).delete()
         Notification.objects.filter(user=user).delete()
-        # 3-1) Posts 관련 데이터
-        from apps.posts.models import Post, Application, PostLike, Schedule
-        # 사용자가 쓴 포스트, 지원, 좋아요, 스케줄 삭제
-        Post.objects.filter(user=user).delete()
-        Application.objects.filter(user=user).delete()
+
+        Schedule.objects.filter(post__user=user).delete()
         PostLike.objects.filter(user=user).delete()
-        Schedule.objects.filter(user=user).delete()
-        # 4) REST Token, JWT Refresh, JWT Refresh
+        Application.objects.filter(user=user).delete()
+        Post.objects.filter(user=user).delete()
+
         Token.objects.filter(user=user).delete()
         for tk in OutstandingToken.objects.filter(user=user):
             BlacklistedToken.objects.get_or_create(token=tk)
-        # 5) 세션 로그아웃
+
         logout(request)
-        # 6) 사용자 삭제
+
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

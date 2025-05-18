@@ -1,4 +1,3 @@
-# apps/app_users/urls_apps.py
 from django.urls import path, include
 from . import views
 from .social_views import KakaoLoginView, NaverLoginView, GithubLoginView, UserLogoutView
