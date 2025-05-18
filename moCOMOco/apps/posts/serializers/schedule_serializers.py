@@ -17,7 +17,7 @@ class ScheduleUpdateSerializer(serializers.ModelSerializer):
 class ScheduleListSerializer(serializers.ModelSerializer):
     post_id = serializers.IntegerField(source='post.id', read_only=True)
     post_title = serializers.CharField(source='post.title', read_only=True)
-    post_date = serializers.SerializerMethodField()
+    post_date = serializers.DateTimeField(source='post.date', read_only=True, required=False)
 
     class Meta:
         model = Schedule
@@ -29,8 +29,5 @@ class ScheduleListSerializer(serializers.ModelSerializer):
             'created_at',
             'post_id',
             'post_date',
-            'post_title'
+            'post_title',
         ]
-
-    def get_post_date(self, obj):
-        return obj.post.date.strftime('%Y-%m-%d') if obj.post.date else None
