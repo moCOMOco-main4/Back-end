@@ -15,6 +15,9 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.shortcuts import get_object_or_404
 from .serializers import UserProfileSerializer
+from allauth.socialaccount.models import SocialAccount
+from apps.chat.models import ChatRoomParticipant, ChatMessage
+from apps.notifications.models import Notification
 
 
 # Position 매핑
@@ -74,8 +77,13 @@ class UserDetailView(APIView):
     def delete(self, request): # self를 사용하므로 static 메서드로 변환하지 않음
         user = request.user
 
-        from allauth.socialaccount.models import SocialAccount
         SocialAccount.objects.filter(user=user).delete()
+
+        ChatRoomParticipant.objects.filter(user=user).delete()
+
+        ChatMessage.objects.filter(chat_user=user).delete()
+
+        Notification.objects.filter(user=user).delete()
 
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
