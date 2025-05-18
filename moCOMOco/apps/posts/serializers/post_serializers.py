@@ -8,7 +8,7 @@ from apps.app_users.models import User
 from apps.posts.models.post import ROLE_CHOICES
 from rest_framework import serializers
 from apps.posts.models.post import Post
-
+from config.wsgi import application
 
 # 한글 역할 -> 영어 역할 매핑
 POSITION_REVERSE_MAP = {
@@ -265,16 +265,28 @@ class PostListSerializerWithParticipants(PostListSerializer):
         fields = PostListSerializer.Meta.fields + ['participants', 'people_status']
 
     def get_participants(self, obj):
-        applications = Application.objects.filter(post=obj).select_related('user')
-        return [
+        applications =Application.objects.filter(post=obj).select_related('user')
+
+        # 신청자 생성
+        participant_list = [
             {
                 "id": app.user.id,
                 "nickname": app.user.nickname,
-                "profile_image": app.user.profile_image.url if app.user.profile_image else None
+                'profile_image': app.user.profile_image.url if app.user.profile_image else None
+
             }
             for app in applications
         ]
 
+        # 작성자도 참여자에 포함
+        if obj.user.id not in [p['id'] for p in participant_list]:
+            participant_list.insert(0, {
+                "id": obj.user.id,
+                "nickname": obj.user.nickname,
+                "profile_image": obj.user.profile_image.url if obj.user.profile_image else None
+            })
+        return participant_list
+
     def get_people_status(self, obj):
-        total = Application.objects.filter(post=obj).count()
-        return total + 1
+        totla = Application.objects.filter(post=obj).count()
+        return totla + 1
