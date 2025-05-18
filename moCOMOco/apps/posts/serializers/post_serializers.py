@@ -178,7 +178,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             {
                 "id": app.user.id,
                 "nickname": app.user.nickname,
-                "profile_image": app.user.profile_image.url if app.user.profile_image else None
+                "profile_image": app.user.profile_image if app.user.profile_image else None
             }
             for app in Application.objects.filter(post=obj).select_related('user')
         ]
