@@ -28,6 +28,6 @@ class ScheduleListSerializer(serializers.ModelSerializer):
             'memo',
             'created_at',
             'post_id',
-            'post_data',
+            'post_date',
             'post_title'
         ]
