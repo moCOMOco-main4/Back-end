@@ -27,8 +27,8 @@ class ScheduleCreateView(PostAccessMixin, generics.CreateAPIView):
         post_id = self.kwargs['post_id']
         post = self.get_post(post_id)
 
-        if post.user != self.request.user:
-            raise PermissionDenied("작성자만 일정을 등록할 수 있습니다.")
+        if not Application.objects.filter(post=post, user=user).exists():
+            raise PermissionDenied("참여한 모임에만 일정을 등록할 수 있습니다.")
 
         schedule = serializer.save(post=post)
         NotificationService.send_schedule_created(schedule)
