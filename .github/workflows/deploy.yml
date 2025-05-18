@@ -47,4 +47,5 @@ jobs:
 
           # 서비스 재시작
           sudo systemctl restart uvicorn
+          sudo systemctl restart gunicorn
           sudo systemctl reload nginx
