@@ -9,6 +9,7 @@ from rest_framework.exceptions import PermissionDenied
 from apps.notifications.services import NotificationService
 from rest_framework.generics import GenericAPIView
 from django.contrib.auth import get_user_model
+from apps.notifications.models import Notification
 
 
 class ChatRoomListView(APIView):
@@ -45,9 +46,11 @@ class ChatRoomListView(APIView):
             latest_message = latest.content if latest else ''
             latest_time = latest.created_at if latest else None
 
-            unread_count = ChatMessage.objects.filter(
-                room_id=room_id
-            ).exclude(chat_user_id=user.id).count()
+            unread_count = Notification.objects.filter(
+                user=user,
+                chat_message__room_id=room_id,
+                is_read=False
+            ).count()
             try:
                 post_pk = int(room_id.split('_',1)[0])
                 post = get_object_or_404(Post, pk=post_pk)
@@ -89,6 +92,18 @@ class ChatMessageListView(generics.ListAPIView):
             .filter(room_id=room_id, is_deleted=False)
             .order_by('created_at')
         )
+
+    def list(self, request, *args, **kwargs):
+        room_id = kwargs['room_id']
+        Notification.objects.filter(
+            user=request.user,
+            chat_message__room_id=room_id,
+            is_read=False
+        ).update(is_read=True)
+
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class ChatMessageCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
