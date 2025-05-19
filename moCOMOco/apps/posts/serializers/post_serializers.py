@@ -34,6 +34,7 @@ class PostCreateListSerializer(serializers.ModelSerializer):
             'backend', 'frontend', 'designer', 'fullstack',
             'schedule'
         ]
+        read_only_fields = ['is_closed']
 
     def create(self, validated_data):
         user = self.context['user']
