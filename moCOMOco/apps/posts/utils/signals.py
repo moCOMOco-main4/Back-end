@@ -12,18 +12,11 @@ def auto_close_post_if_full(sender, instance, created, **kwargs):
         return
 
     post = instance.post
-    role = instance.role
-
-    current_count = Application.objects.filter(post=post, role=role).count()
-
-    max_count = post.roles.get(role, 0)
 
     total_current = Application.objects.filter(post=post).count()
-
     total_max = sum(post.roles.values())
 
-    if current_count >= max_count or total_current >= total_max - 1:
-        if not post.is_closed:
+    if total_current >= total_max - 1:
             post.is_closed = True
             post.save()
 
@@ -35,7 +28,7 @@ def auto_reopen_post_if_not_full(sender, instance, **kwargs):
     total_current = Application.objects.filter(post=post).count()
     total_max = sum(post.roles.values())
 
-    if total_current < total_max - 1and post.is_closed:
+    if total_current < total_max - 1 and post.is_closed:
         post.is_closed = False
         post.save()
 
