@@ -36,6 +36,9 @@ class KakaoLoginView(SocialLoginView):
         response = super().get_response()
         user = self.user
 
+        is_new_user = getattr(user, '_is_new_user', False)
+        print(f"[DEBUG] Captured is_new_user before DB fetch: {is_new_user}")
+
         # 사용자 정보 확인 및 업데이트 (필요시)
         if not user.provider or user.provider != 'kakao':
             user.provider = 'kakao'
@@ -53,7 +56,7 @@ class KakaoLoginView(SocialLoginView):
         #사용자 정보 포함
         user_data = UserDetailSerializer(user).data
         response.data['user'] = user_data
-        response.data['isNewUser'] = getattr(user, '_is_new_user', False)
+        response.data['isNewUser'] = is_new_user
 
         # 디버깅 정보 출력
         print(f"[DEBUG] Kakao login response user data: {user_data}")
@@ -76,6 +79,9 @@ class NaverLoginView(SocialLoginView):
         response = super().get_response()
         user = self.user
 
+        is_new_user = getattr(user, '_is_new_user', False)
+        print(f"[DEBUG] Captured is_new_user before DB fetch: {is_new_user}")
+
         # 사용자 정보 확인 밒 업데이트 (필요시)
         if not user.provider or user.provider != 'naver':
             user.provider = 'naver'
@@ -93,7 +99,7 @@ class NaverLoginView(SocialLoginView):
         #사용자 정보 포함
         user_data = UserDetailSerializer(user).data
         response.data['user'] = user_data
-        response.data['isNewUser'] = getattr(user, '_is_new_user', False)
+        response.data['isNewUser'] = is_new_user
 
         # 디버깅 정보 출력
         print(f"[DEBUG] Naver login response user data: {user_data}")
