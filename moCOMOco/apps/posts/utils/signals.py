@@ -15,32 +15,31 @@ def auto_close_post_if_full(sender, instance, created, **kwargs):
     role = instance.role
 
     current_count = Application.objects.filter(post=post, role=role).count()
-    if post.writer_role == role:
-        current_count += 1
+
+    max_count = post.roles.get(role, 0)
 
     total_current = Application.objects.filter(post=post).count()
-    total_current += 1
 
     total_max = sum(post.roles.values())
 
-    if current_count >= post.roles.get(role, 0) or total_current >= total_max:
+    if current_count >= max_count or total_current >= total_max - 1:
         if not post.is_closed:
             post.is_closed = True
             post.save()
 
-
+# 인원 빠지면 다시 오픈
 @receiver(post_delete, sender=Application)
 def auto_reopen_post_if_not_full(sender, instance, **kwargs):
     post = instance.post
+
     total_current = Application.objects.filter(post=post).count()
-    total_current += 1
     total_max = sum(post.roles.values())
 
-    if total_current < total_max and post.is_closed:
+    if total_current < total_max - 1and post.is_closed:
         post.is_closed = False
         post.save()
 
-
+# 채팅???
 @receiver(post_save, sender=Application)
 def on_application_accepted(sender, instance, created, **kwargs):
     if created:
