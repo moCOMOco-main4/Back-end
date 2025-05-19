@@ -32,13 +32,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         email = sociallogin.account.extra_data.get('email') or sociallogin.user.email
         is_new_user = not User.objects.filter(email=email).exists()
 
-        if not is_new_user:
-            from allauth.socialaccount.models import SocialAccount
-            existing_social = SocialAccount.objects.filter(
-                provider=sociallogin.account.provider,
-                uid=sociallogin.account.uid
-            ).exists()
-            is_new_user = not existing_social
+    #    if not is_new_user:
+    #       from allauth.socialaccount.models import SocialAccount
+    #        existing_social = SocialAccount.objects.filter(
+    #            provider=sociallogin.account.provider,
+    #            uid=sociallogin.account.uid
+    #        ).exists()
+    #        is_new_user = not existing_social
 
         # 기본 사용자 저장 로직 실행
         user = super().save_user(request, sociallogin, form)
