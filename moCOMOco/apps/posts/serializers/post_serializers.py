@@ -204,7 +204,11 @@ class PostDetailSerializer(serializers.ModelSerializer):
         if obj.writer_role:
             role_counts[obj.writer_role] += 1
 
-        return {role: role_counts.get(role, 0) for role in obj.roles.keys()}
+        remaining = {}
+        for role, max_count in obj.roles.items():
+            remaining[role] = max(0, max_count - role_counts.get(role, 0))
+
+        return remaining
 
     def get_is_writer(self, obj):
         request = self.context.get('request')
