@@ -1,39 +1,70 @@
 # moCOMOco
 
-## 프로젝트 소개
+## 📌 프로젝트 소개
 
-> ** 모코모코**는 개발자들이 **모각코(모여서 각자 코딩)**를 함께 할 수 있도록 도와주는 모임 기반 커뮤니티 서비스입니다.
-사용자들이 자유롭게 모각코 모임을 생성하거나 참여할 수 있고, 모임별 게시글, 채팅 기능, 모임 장소 정보 공유를 통해 실제 만남과 협업이 원활하게 이루어질 수 있도록 구성되어 있습니다.
-
-## 주요 기능
-
-* **JWT 기반 사용자 인증 시스템 구축**: 회원가입, 로그인, 로그아웃, 회원탈퇴 기능 구현
-* **게시판 기능 구현**: 게시글 작성, 수정, 삭제, 댓글 기능, 게시글 통계 및 자동 태그 분류 기능 구현
-* **일정 기능 개발**: 신청/승인 기반의 일정 등록 및 관리 시스템 구현 (게임 기반 시나리오 포함)
-* **채팅 기능 구현**: Django Channels + WebSocket 기반 실시간 1:1 채팅 구현 및 알림 시스템 구축
-* **CI/CD 파이프라인 자동화**: GitHub Actions 통한 테스트 및 배포 자동화
-* **서버 구축 및 운영 환경**: AWS EC2, S3, RDS 기반 인프라 환경 구성 및 모니터링 체계 확보
+> **모코모코**는 개발자들이 \*\*모각코( 모여서 각자 코딩 )\*\*을 함께 할 수 있도록 도움을 줄 수 있는 모임 기반 컨텐츠 서비스입니다.
+>
+> 사용자들이 자유롭게 모각코 모임을 생성하거나 참여할 수 있고,
+> 모임별 게시글, 채팅 기능, 모임 장소 정보 공유를 통해 실제 만남과 협업이 원하드로운 구성으로 조정되었습니다.
 
 ---
 
-## 기술 스택
+## 🚀 주요 기능
 
-| 분류      | 기술                                  |
-| ------- | ----------------------------------- |
-| 언어      | Python                              |
-| 웹 프레임워크 | Django, Django REST Framework       |
-| DB      | PostgreSQL, SQLite (개발용)            |
-| 비동기 처리  | Django Channels, Uvicorn, WebSocket |
-| 메시지 브로커 | Redis                               |
-| 인증/보안   | JWT, OAuth2                         |
-| 배포      | AWS EC2, S3, RDS, Nginx, Gunicorn   |
-| 테스트/문서화 | GitHub Actions, Postman             |
+* 🔐 **JWT 기본 사용자 인증 시스템 구성**
+  회원가입, 로그인, 로그아웃, 회원탈퇴 기능 구현
+
+* 📄 **게시판 기능 구현**
+  게시글 작성, 수정, 삭제, 댓글 기능, 게시글 통계 및 자동 태그 분류 기능 구현
+
+* 📆 **일정 기능 개발**
+  신청/승인 기반의 일정 등록 및 관리 시스템 구성 ( 게임 기본 시나리오 포함 )
+
+* 💬 **채팅 기능 구현**
+  Django Channels + WebSocket 기반 실시간 1:1 채팅 구현 및 알림 시스템 구성
+
+* ⚙️ **CI/CD 파이프라인 자동화**
+  GitHub Actions 통한 테스트 및 배포 자동화
+
+* ☁️ **서버 구성 및 운영 환경**
+  AWS EC2, S3, RDS 기반 인프라 환경 구성 및 모니터링 체계 확답
+
+---
+
+## 🛠️ 기술 스택
+
+<table>
+  <tr>
+    <td><img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" width="40"/></td>
+    <td><img src="https://static.djangoproject.com/img/logos/django-logo-negative.svg" width="60"/></td>
+    <td><img src="https://www.postgresql.org/media/img/about/press/elephant.png" width="40"/></td>
+    <td><img src="https://raw.githubusercontent.com/encode/uvicorn/master/docs/uvicorn.png" width="60"/></td>
+    <td><img src="https://cdn.iconscout.com/icon/free/png-256/nginx-3-1174926.png" width="60"/></td>
+    <td><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="40"/></td>
+    <td><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" width="80"/></td>
+    <td><img src="https://cdn-icons-png.flaticon.com/512/919/919836.png" width="40"/></td>
+    <td><img src="https://cdn.icon-icons.com/icons2/2699/PNG/512/gunicorn_logo_icon_171025.png" width="60"/></td>
+  </tr>
+</table>
+
+| 🧱 분류   | 🪰 기술 내용                                    |
+| ------- | ------------------------------------------- |
+| 언어      | `Python`                                    |
+| 웹 프레임워크 | `Django`, `Django REST Framework`           |
+| 데이터베이스  | `PostgreSQL`, `SQLite ( 개발용 )`              |
+| 비동기 처리  | `Django Channels`, `Uvicorn`, `WebSocket`   |
+| 메시지 브로커 | `Redis`                                     |
+| 인증/보안   | `JWT`, `OAuth2`                             |
+| 배포/인프라  | `AWS EC2`, `S3`, `RDS`, `Gunicorn`, `Nginx` |
+| 테스트/문서화 | `GitHub Actions`, `Postman`                 |
+
+
 
 ---
 
 ## 시스템 아키텍처
 
-![architecture diagram](https://github.com/user-attachments/assets/d5d7e9d1-54de-4c25-a1ec-4a2726a53cee)
+![architecture diagram](https://github.com/user-attachments/assets/de155d73-3673-450c-9947-c71160f12728)
 
 
 ---
@@ -53,7 +84,7 @@
 ---
 
 ## 프로젝트 구조
-
+```
 Back-end/
 ├── README.md
 ├── moCOMOco
@@ -68,7 +99,7 @@ Back-end/
 │ └── .env
 ├── poetry.lock
 └── pyproject.toml
-
+```
 
 ## 부록
 
