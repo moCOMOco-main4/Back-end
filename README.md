@@ -1,6 +1,6 @@
 # moCOMOco
 
-## 📌 프로젝트 소개
+## 📌 Project Introduction
 
 > **모코모코**는 개발자들이 \*\*모각코( 모여서 각자 코딩 )\*\*을 함께 할 수 있도록 도움을 줄 수 있는 모임 기반 컨텐츠 서비스입니다.
 >
@@ -8,13 +8,13 @@
 > 모임별 게시글, 채팅 기능, 모임 장소 정보 공유를 통해 실제 만남과 협업이 원하드로운 구성으로 조정되었습니다.
 
 ---
-## 🔗 배포 링크
+## 🔗 Deployment Link
 
 > ### [  moCOMOco ](https://mocomoco.store)
 
 ---
 
-## 🚀 주요 기능
+## 🚀 Key Features
 
 * 🔐 **JWT 기본 사용자 인증 시스템 구성**
   회원가입, 로그인, 로그아웃, 회원탈퇴 기능 구현
@@ -36,7 +36,7 @@
 
 ---
 
-## 🛠️ 기술 스택
+## 🛠️ Tech Stack
 
 <table>
   <tr>
@@ -67,14 +67,14 @@
 
 ---
 
-## 시스템 아키텍처
+## System Architecture
 
 ![architecture diagram](https://github.com/user-attachments/assets/de155d73-3673-450c-9947-c71160f12728)
 
 
 ---
 
-## 팀 구성 및 역할
+## Team & Roles
 <table>
     <tbody>
         <tr>
@@ -141,7 +141,7 @@
 
 ---
 
-## 프로젝트 구조
+## Project Structure
 ```
 Back-end/
 ├── README.md
@@ -159,8 +159,7 @@ Back-end/
 └── pyproject.toml
 ```
 
-## 부록
-
+## Appendices
 - [API 명세서](https://docs.google.com/spreadsheets/d/1F6xNcYVO3vJ38lsJw_J3GF30JE0AERvMfNzOfwWoeyE/edit?gid=1565530336#gid=1565530336)
 - [ERD](https://www.erdcloud.com/d/LAzPDR6vwpJzNSWBR)
 - [테이블 명세서](https://docs.google.com/spreadsheets/d/1_dZHSUO7f2W8TbmoRWCSNq3oXzqNW03tCdp4vUhwu4w/edit?gid=0#gid=0)
