@@ -224,7 +224,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'key': ''
         },
         'SCOPE': ['account_email', 'profile_nickname'],
-        'PROFILE_FIELDS': ['email', 'nickname', 'profile_image_url'],
+        'PROFILE_FIELDS': ['email', 'nickname', 'profile_image'],
     },
     'naver': {
         'APP': {
