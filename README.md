@@ -47,8 +47,8 @@
   </tr>
 </table>
 
-| 🧱 분류   | 🪰 기술 내용                                    |
-| ------- | ------------------------------------------- |
+| 🧱 분류   | 🪰 기술 내용                                                                              |
+| ------- | -------------------------------------------          |
 | 언어      | `Python`                                    |
 | 웹 프레임워크 | `Django`, `Django REST Framework`           |
 | 데이터베이스  | `PostgreSQL`, `SQLite ( 개발용 )`              |
@@ -104,6 +104,6 @@ Back-end/
 ## 부록
 
 - [API 명세서](https://docs.google.com/spreadsheets/d/1F6xNcYVO3vJ38lsJw_J3GF30JE0AERvMfNzOfwWoeyE/edit?gid=1565530336#gid=1565530336)
-- [ERD](./docs/erd-diagram.png)
+- [ERD](https://www.erdcloud.com/d/LAzPDR6vwpJzNSWBR)
 - [테이블 명세서](https://docs.google.com/spreadsheets/d/1_dZHSUO7f2W8TbmoRWCSNq3oXzqNW03tCdp4vUhwu4w/edit?gid=0#gid=0)
 - [사용자 요구사항 정의서](https://docs.google.com/spreadsheets/d/10pRKf7R6h8pqu2bZXpOhcKV4o6SFsKuUjfmEoLp117A/edit?gid=300631716#gid=300631716)
