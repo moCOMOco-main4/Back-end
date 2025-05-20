@@ -54,7 +54,20 @@
 
 ## 프로젝트 구조
 
-![2025년 5월 21일 오전 12_58_53](https://github.com/user-attachments/assets/12b43c4e-712c-41d1-9ca3-40c8e7828b4b)
+Back-end/
+├── README.md
+├── moCOMOco
+│ ├── apps
+│ │ ├── app_users
+│ │ ├── chat
+│ │ ├── notifications
+│ │ └── posts
+│ ├── config
+│ ├── db.sqlite3
+│ ├── manage.py
+│ └── .env
+├── poetry.lock
+└── pyproject.toml
 
 
 ## 부록
