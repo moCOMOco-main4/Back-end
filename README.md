@@ -75,6 +75,59 @@
 ---
 
 ## 팀 구성 및 역할
+<table>
+    <tbody>
+        <tr>
+            <td>
+                <a href="https://github.com/WOOJOUNG-KIM">
+                    <img src="https://avatars.githubusercontent.com/WOOJOUNG-KIM" width="100" height="100"/>
+                </a>  
+            </td>
+            <td>
+                <a href="https://github.com/Alex424525">
+                    <img src="https://avatars.githubusercontent.com/Alex424525" width="100" height="100"/>
+                </a>  
+            </td>
+            <td>
+                <a href="https://github.com/JunHo-L">
+                    <img src="https://avatars.githubusercontent.com/JunHo-L" width="100" height="100"/>
+                </a>  
+            </td>
+            <td>
+                <a href="https://github.com/workface">
+                    <img src="https://avatars.githubusercontent.com/workface" width="100" height="100"/>
+                </a>  
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <a href="https://github.com/seonysun">김우중</a>
+            </th>
+            <th>
+                <a href="https://github.com/Gu-Sul">송희태</a>
+            </th>
+            <th>
+                <a href="https://github.com/neuliii">이준호</a>
+            </th>
+            <th>
+                <a href="https://github.com/namul21">조수민</a>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                BackEnd
+            </th>
+            <th>
+                BackEnd
+            </th>
+            <th>
+                BackEnd
+            </th>
+            <th>
+                BackEnd
+            </th>
+        </tr>
+    </tbody>
 
 
 | 이름       | 역할 |
