@@ -29,7 +29,7 @@ class KakaoLoginView(SocialLoginView):
     """
     adapter_class = KakaoOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = settings.KAKAO_REDIRECT_URI
+    callback_url = FRONTEND_URL + '/auth/callback/kakao'
     permission_classes = [AllowAny]
     
     def get_response(self):
