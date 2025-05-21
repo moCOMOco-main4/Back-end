@@ -1,29 +1,30 @@
 # moCOMOco
 
 
+
 ## Table of Contents
 
-1. [Project Introduction](#project-introduction)
-2. [Deployment Link](#deployment-link)
-3. [Key Features](#key-features)
-   - [OAuth2 기반 소셜 로그인 + JWT 인증 시스템](#oauth2-기반-소셜-로그인--jwt-인증-시스템)
-   - [게시판 기능 구현](#게시판-기능-구현)
-   - [일정 기능 개발](#일정-기능-개발)
-   - [실시간 채팅 기능](#실시간-채팅-기능)
-   - [CI/CD 파이프라인 자동화](#cicd-파이프라인-자동화)
-   - [서버 인프라 구성 및 운영](#서버-인프라-구성-및-운영)
-4. [Tech Stack](#tech-stack)
-5. [Team & Roles](#team--roles)
-6. [Troubleshooting](#troubleshooting)
-7. [Project Structure](#project-structure)
-8. [Appendices](#appendices)
-   - [API 명세서](#api-명세서)
-   - [ERD](#erd)
-   - [테이블 명세서](#테이블-명세서)
-   - [사용자 요구사항 정의서](#사용자-요구사항-정의서)
+1. [📌 Project Introduction](#project-introduction)
+2. [🔗 Deployment Link](#deployment-link)
+3. [🚀 Key Features](#key-features)
+   - [🔐 OAuth2 기반 소셜 로그인 + JWT 인증 시스템](#oauth2-기반-소셜-로그인--jwt-인증-시스템)
+   - [📄 게시판 기능 구현](#게시판-기능-구현)
+   - [📆 일정 기능 개발](#일정-기능-개발)
+   - [💬 실시간 채팅 기능](#실시간-채팅-기능)
+   - [⚙️ CI/CD 파이프라인 자동화](#cicd-파이프라인-자동화)
+   - [☁️ 서버 인프라 구성 및 운영](#서버-인프라-구성-및-운영)
+4. [🛠️ Tech Stack](#tech-stack)
+5. [👥 Team & Roles](#team--roles)
+6. [🐞 Troubleshooting](#troubleshooting)
+7. [📂 Project Structure](#project-structure)
+8. [📑 Appendices](#appendices)
+   - [📋 API 명세서](#api-명세서)
+   - [🗺️ ERD](#erd)
+   - [📊 테이블 명세서](#테이블-명세서)
+   - [✍️ 사용자 요구사항 정의서](#사용자-요구사항-정의서)
 
 ---
-
+<a id="project-introduction"></a>
 ## 📌 Project Introduction
 
 > **모코모코**는 개발자들이 \*\*모각코( 모여서 각자 코딩 )\*\*을 함께 할 수 있도록 도움을 줄 수 있는 모임 기반 컨텐츠 서비스입니다.
@@ -32,37 +33,46 @@
 > 모임별 게시글, 채팅 기능, 모임 장소 정보 공유를 통해 실제 만남과 협업이 원하드로운 구성으로 조정되었습니다.
 
 ---
+
+<a id="deployment-link"></a>
 ## 🔗 Deployment Link
 
 > ### [  moCOMOco ](https://mocomoco.store)
 
 ---
 
+<a id="key-features"></a>
 ## 🚀 Key Features
 
-
+  <a id="oauth2-기반-소셜-로그인--jwt-인증-시스템"></a>
 * 🔐 **OAuth2 기반 소셜 로그인 + JWT 인증 시스템**
   자체 회원가입 없이 **카카오, 네이버 소셜 로그인만 지원**하며,
   로그인 후에는 JWT 토큰을 활용한 인증 처리 (로그인, 로그아웃, 회원탈퇴)
 
+  <a id="게시판-기능-구현"></a>
 * 📄 **게시판 기능 구현**
   게시글 작성, 수정, 삭제 기능 제공
 
+  <a id="일정-기능-개발"></a>
 * 📆 **일정 기능 개발**
   신청/승인 방식의 일정 등록 및 관리 시스템 구현
 
+  <a id="실시간-채팅-기능"></a>
 * 💬 **실시간 채팅 기능**
   Django Channels + WebSocket 기반 1:1 실시간 채팅 및 알림 시스템 구성
 
+  <a id="cicd-파이프라인-자동화"></a>
 * ⚙️ **CI/CD 파이프라인 자동화**
   GitHub Actions를 활용한 테스트 및 배포 자동화 구성
 
+  <a id="서버-인프라-구성-및-운영"></a>
 * ☁️ **서버 인프라 구성 및 운영**
   AWS EC2, S3, RDS 기반 인프라 환경 구성 및 모니터링 체계 구축
 
 
 ---
 
+<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
 <table>
@@ -95,7 +105,7 @@
 ---
 
 
-
+<a id="team--roles"></a>
 ## Team & Roles
 <table>
     <tbody>
@@ -164,6 +174,7 @@
 
 ---
 
+<a id="troubleshooting"></a>
 ## 🐞 Trouble Shooting
 
 <details>
@@ -316,6 +327,7 @@ source ~/.bashrc
 ---
 </details>
 
+<a id="project-structure"></a>
 ## Project Structure
 ```
 Back-end/
@@ -334,6 +346,7 @@ Back-end/
 └── pyproject.toml
 ```
 
+<a id="appendices"></a>
 ## Appendices
 - [API 명세서](https://docs.google.com/spreadsheets/d/1F6xNcYVO3vJ38lsJw_J3GF30JE0AERvMfNzOfwWoeyE/edit?gid=1565530336#gid=1565530336)
 - [ERD](https://dbdiagram.io/d/67e5ea9e4f7afba18481a7c7)
