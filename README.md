@@ -70,136 +70,7 @@
 
 ---
 
-## 🐞 Trouble Shooting
 
-### 👤 김우중 – 모임 마감 처리 및 보안 이슈
-
-#### ❌ 문제
-
-모집글 자동 마감 기능 구현 중,
-신청 인원이 꽉 찼는데도 is\_closed가 True로 즉시 반영되지 않는 현상 발생.
-
-#### 🔍 원인 분석
-
-* Django signal(post\_save) 처리 시점과 .count()를 사용하는 queryset 평가 지연(lazy evaluation) 이 충돌함.
-* Application.objects.filter(...).count()가 최신 상태 반영 전에 평가되어 현재 인원 < 최대 인원으로 잘못 계산되는 문제 발생.
-
-#### ✅ 해결 방법
-
-* DB에서 .count() 평가 시점을 신청 저장 후 시점으로 명확히 고정
-* queryset을 미리 평가하지 않도록 하고, signal 내에서 .count() 호출 전에 정확한 순서로 DB 접근 로직 수정
-
-#### ✅ 추가 보안 조치
-
-* 게시판 Markdown 렌더링 중 XSS 이슈를 방지하기 위해 bleach 라이브러리를 도입하여 보안 필터링 처리
-* 게시판 Markdown 렌더링 중 XSS 이슈를 방지하기 위해 `bleach` 라이브러리를 도입하여 보안 필터링 처리
-
----
-
-### 👤 송희태 – 인증 및 배포 관련 이슈
-
-#### ✅ 카카오 로그인 문제
-
-* ❌ 문제: 로그인 연결 실패
-* 🔍 원인: Django admin의 도메인이 'example.com'으로 설정되어 있었고 Redirect\_URL과 환경 변수 설정 불일치
-* ✅ 해결: admin 설정 변경 및 환경 변수 수정으로 일치시킴
-
-#### ✅ 서버 배포 이슈
-
-* ❌ 문제: 로컬에서는 작동하나 서버에서는 로그인 불가
-* 🔍 원인: Nginx에서 CORS 헤더 덮어쓰기, AWS RDS 타임아웃
-* ✅ 해결: Nginx 설정 수정, DB 연결 최적화, 환경설정 파일을 prod 설정으로 변경
-
-#### ✅ 네이버 로그인 문제
-
-* ❌ 문제: 400 에러 지속 발생
-* 🔍 원인: 인가코드를 액세스 토큰으로 변환 과정에서 오류 발생
-* ✅ 해결: 네이버 개발 문서 정독 후 API 호출 방식 수정
-
-#### ✅ 회원 탈퇴 관련 알림 오류
-
-* ❌ 문제: 사용자 탈퇴 시 알림 생성 과정에서 오류 발생
-* 🔍 원인: 채팅방 participant 정보 삭제로 인한 참조 오류
-* ✅ 해결: 탈퇴 처리 순서 조정 및 participant 필드 NULL 허용
-
-#### ✅ 로그아웃 문제
-
-* ❌ 문제: 401 에러 발생
-* 🔍 원인: URL 패턴 순서 오류
-* ✅ 해결: URL 패턴 재배치
-
----
-
-### 👤 이준호 – WebSocket 및 알림 오류
-
-#### ❌ 문제
-
-1. WebSocket 연결 시 301 리디렉션과 500 오류 발생, 즉시 연결 종료
-2. 채팅 메시지 전송 시 일부 사용자에게 알림 미전달
-
-#### 🔍 원인 분석
-
-* Nginx에서 /ws 경로에 잘못된 리디렉션 설정 적용
-* WebSocket에서 JWT 인증 누락으로 scope\["user"]가 익명 처리됨
-* NotificationService에서 알림 수신자 필터 조건 누락
-
-#### ✅ 해결 방법
-
-* /ws/ 경로에 정확한 WebSocket 프록시 설정 적용
-* JWT 인증 미들웨어 추가 및 알림 수신자 필터링 로직 보완
-
----
-
-### 👤 조수민 – 서버 인프라 및 WebSocket 배포 이슈
-
-#### ✅ WebSocket 통신 실패
-
-* ❌ 문제: WebSocket 요청이 Django로 도달하지 않음
-* 🔍 원인: Nginx 설정에 `/ws/` 경로 누락 및 `Upgrade`, `Connection` 헤더 미설정
-* ✅ 해결: WebSocket 경로 별도 location 블록 추가 및 헤더 설정 후 nginx 재시작
-
-```nginx
-location /ws/ {
-    proxy_pass http://127.0.0.1:8001;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "Upgrade";
-    proxy_set_header Host $host;
-    proxy_read_timeout 86400;
-}
-```
-
-#### ✅ Gunicorn + Uvicorn 구성 문제
-
-* ❌ 문제: Gunicorn에서 ASGI 처리를 제대로 못하는 현상 발생
-* 🔍 원인: 일반 Gunicorn Worker 사용으로 WebSocket 연결 실패
-* ✅ 해결: `UvicornWorker`로 worker 클래스를 명시하여 Gunicorn이 ASGI 서버로 동작하도록 수정
-
-```bash
-gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker
-```
-
-#### ✅ 개발 서버 가상환경 활성화 이슈
-
-* ❌ 문제: CI/CD 파이프라인에서 `poetry install` 실행 시 가상환경이 활성화되지 않아 실행 오류 발생
-* 🔍 원인: Ubuntu 기본 환경에서 poetry 바이너리 경로가 `$PATH`에 등록되지 않아 명령어 인식 실패
-* ✅ 해결: `.bashrc` 파일에 명시적으로 경로 추가 후 source로 적용하거나, GitHub Actions에서 환경변수 수동 지정
-
-```bash
-# ~/.bashrc 마지막 줄에 추가
-export PATH="$HOME/.local/bin:$PATH"
-
-# 적용
-source ~/.bashrc
-```
-
-* 이후 CI/CD 파이프라인 내에서 `poetry install` 정상 작동 확인
-
-
-
-
-
----
 
 ## Team & Roles
 <table>
@@ -268,6 +139,158 @@ source ~/.bashrc
 
 
 ---
+
+## 🐞 Trouble Shooting
+
+<details>
+<summary>👤 김우중 – 모임 마감 처리 및 보안 이슈</summary>
+
+❌ **문제**
+
+모집글 자동 마감 기능 구현 중, 신청 인원이 꽉 찼는데도 `is_closed`가 `True`로 즉시 반영되지 않는 현상 발생.
+
+🔍 **원인 분석**
+
+* Django `post_save` signal 처리 시점과 `.count()`를 사용하는 queryset 평가 지연(lazy evaluation)이 충돌함.
+* `Application.objects.filter(...).count()`가 최신 상태 반영 전에 평가되어 현재 인원 < 최대 인원으로 잘못 계산됨.
+
+✅ **해결 방법**
+
+* DB에서 `.count()` 평가 시점을 신청 저장 후로 명확히 고정.
+* Queryset을 미리 평가하지 않도록 하고, signal 내에서 `.count()` 호출 전에 정확한 순서로 DB 접근 로직 수정.
+
+✅ **추가 보안 조치**
+
+* 게시판 Markdown 렌더링 중 XSS 이슈를 방지하기 위해 `bleach` 라이브러리를 도입하여 보안 필터링 처리.
+
+</details>
+
+<details>
+<summary>👤 송희태 – 인증 및 배포 관련 이슈</summary>
+
+✅ **카카오 로그인 문제**
+
+❌ **문제**: 로그인 연결 실패
+
+🔍 **원인**: Django admin의 도메인이 'example.com'으로 설정되어 있었고 Redirect\_URL과 환경 변수 설정 불일치
+
+✅ **해결**: admin 설정 변경 및 환경 변수 수정으로 일치시킴
+
+---
+
+✅ **서버 배포 이슈**
+
+❌ **문제**: 로컬에서는 작동하나 서버에서는 로그인 불가
+
+🔍 **원인**: Nginx에서 CORS 헤더 덮어쓰기, AWS RDS 타임아웃
+
+✅ **해결**: Nginx 설정 수정, DB 연결 최적화, 환경설정 파일을 prod 설정으로 변경
+
+---
+
+✅ **네이버 로그인 문제**
+
+❌ **문제**: 400 에러 지속 발생
+
+🔍 **원인**: 인가코드를 액세스 토큰으로 변환 과정에서 오류 발생
+
+✅ **해결**: 네이버 개발 문서 정독 후 API 호출 방식 수정
+
+---
+
+✅ **회원 탈퇴 관련 알림 오류**
+
+❌ **문제**: 사용자 탈퇴 시 알림 생성 과정에서 오류 발생
+
+🔍 **원인**: 채팅방 participant 정보 삭제로 인한 참조 오류
+
+✅ **해결**: 탈퇴 처리 순서 조정 및 participant 필드 NULL 허용
+
+---
+
+✅ **로그아웃 문제**
+
+❌ **문제**: 401 에러 발생
+
+🔍 **원인**: URL 패턴 순서 오류
+
+✅ **해결**: URL 패턴 재배치
+
+</details>
+
+<details>
+<summary>👤 이준호 – WebSocket 및 알림 오류</summary>
+
+❌ **문제**
+
+* WebSocket 연결 시 301 리디렉션과 500 오류 발생, 즉시 연결 종료
+* 채팅 메시지 전송 시 일부 사용자에게 알림 미전달
+
+🔍 **원인 분석**
+
+* Nginx에서 `/ws` 경로에 잘못된 리디렉션 설정 적용
+* WebSocket에서 JWT 인증 누락으로 `scope["user"]`가 익명 처리됨
+* `NotificationService`에서 알림 수신자 필터 조건 누락
+
+✅ **해결 방법**
+
+* `/ws/` 경로에 정확한 WebSocket 프록시 설정 적용
+* JWT 인증 미들웨어 추가 및 알림 수신자 필터링 로직 보완
+
+</details>
+
+<details>
+<summary>👤 조수민 – 서버 인프라 및 WebSocket 배포 이슈</summary>
+
+✅ **WebSocket 통신 실패**
+
+❌ **문제**: WebSocket 요청이 Django로 도달하지 않음
+
+🔍 **원인**: Nginx 설정에 `/ws/` 경로 누락 및 `Upgrade`, `Connection` 헤더 미설정
+
+✅ **해결**: WebSocket 경로 별도 location 블록 추가 및 헤더 설정 후 nginx 재시작
+
+```nginx
+location /ws/ {
+    proxy_pass http://127.0.0.1:8001;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host $host;
+    proxy_read_timeout 86400;
+}
+```
+
+✅ **Gunicorn + Uvicorn 구성 문제**
+
+❌ **문제**: Gunicorn에서 ASGI 처리를 제대로 못하는 현상 발생
+
+🔍 **원인**: 일반 Gunicorn Worker 사용으로 WebSocket 연결 실패
+
+✅ **해결**: `UvicornWorker`로 worker 클래스를 명시하여 Gunicorn이 ASGI 서버로 동작하도록 수정
+
+```bash
+gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker
+```
+
+✅ **개발 서버 가상환경 활성화 이슈**
+
+❌ **문제**: CI/CD 파이프라인에서 `poetry install` 실행 시 가상환경이 활성화되지 않아 실행 오류 발생
+
+🔍 **원인**: Ubuntu 기본 환경에서 poetry 바이너리 경로가 `$PATH`에 등록되지 않아 명령어 인식 실패
+
+✅ **해결**: `.bashrc` 파일에 명시적으로 경로 추가 후 `source`로 적용하거나, GitHub Actions에서 환경변수 수동 지정
+
+```bash
+# ~/.bashrc 마지막 줄에 추가
+export PATH="$HOME/.local/bin:$PATH"
+
+# 적용
+source ~/.bashrc
+```
+
+---
+</details>
 
 ## Project Structure
 ```
